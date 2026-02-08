@@ -28,83 +28,12 @@ body {
   margin: 0;
   font-family: SamimV1, sans-serif;
   background: #fafafa;
-
   direction: rtl;
 
-  /* FIXED */
-  min-height: 100dvh; /* better than 100vh for phones */
-  display: flex;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-
-/* ================================================= */
-/* ================= MOBILE FIX ==================== */
-/* ================================================= */
-
-@media (max-width: 768px) {
-
-  /* stack layout vertically */
- #container {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  min-height: 100dvh;
-
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-
-  /* sidebar full width on top */
-  #dua-list {
-    width: 100%;
-    max-height: 35vh;
-  }
-
-  /* smaller title */
-  #dua-name {
-    font-size: 22px;
-  }
-
-  #dua-name .persian {
-    font-size: 18px;
-  }
-
-  /* smaller Arabic text */
-  .arabic-line {
-    font-size: clamp(26px, 5vw, 60px);
-    line-height: 2;
-  }
-
-  /* smaller translation/meta */
-  .translation,
-  .meta-line {
-    font-size: 16px;
-  }
-
-  /* reduce bottom spacing */
-  .persian-area {
-    bottom: 50px;
-  }
-
-  /* smaller controls */
-  #controls {
-    height: 70px;
-    gap: 6px;
-  }
-
-  #slide-slider {
-    width: 180px;
-  }
-
-  #controls .btn-ar {
-    font-size: 16px;
-  }
-
-  #controls .btn-fa {
-    font-size: 14px;
-  }
-}
 
 
 /* ================================================= */
@@ -113,9 +42,9 @@ body {
 
 #container {
   display: flex;
+  width: 100vw;
+  height: 100dvh;
   gap: 10px;
-  width: 100%;
-  height: 100%;
   padding: 40px 60px;
   box-sizing: border-box;
 }
@@ -143,13 +72,13 @@ body {
 
 /* ================================================= */
 /* ================= SCREEN ======================== */
-/* hidden until dua selected                         */
 /* ================================================= */
 
 #screen {
   flex: 1;
-  display: none; /* ⭐ start hidden */
+  display: none;
   flex-direction: column;
+  min-width: 0;
 }
 
 
@@ -245,22 +174,19 @@ body {
 
 .arabic-line {
   font-family: NotoNaskhArabic, QuranTaha, serif;
-  font-size: clamp(26px, 5vw, 60px);
+  font-size: 60px;
 }
 
-/* ⭐ Persian translation (gray) */
 .translation {
   font-family: SamimV1;
   font-size: 20px;
-  color: #6b6b6b;   /* gray */
+  color: #6b6b6b;
 }
 
-
-/* ⭐ Meta line (blue) */
 .meta-line {
   font-family: SamimV1;
   font-size: 20px;
-  color: #1e40af;   /* blue */
+  color: #1e40af;
 }
 
 
@@ -279,10 +205,6 @@ body {
 
   background: #fafafa;
 }
-
-
-
-/* ⭐ RESTORED BUTTON FONTS ⭐ */
 
 #controls button {
   display: flex;
@@ -319,4 +241,67 @@ body {
   width: 300px;
   direction: rtl;
   transform: scaleX(-1);
+}
+
+
+
+/* ================================================= */
+/* ================= MOBILE ONLY =================== */
+/* ================================================= */
+
+@media (max-width: 768px) {
+
+  body {
+    overflow: auto;
+  }
+
+  #container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  #dua-list {
+    width: 100%;
+    max-height: 35dvh;
+  }
+
+  #dua-name {
+    font-size: 22px;
+  }
+
+  #dua-name .persian {
+    font-size: 18px;
+  }
+
+  .arabic-line {
+    font-size: 32px;
+    line-height: 2;
+  }
+
+  .translation,
+  .meta-line {
+    font-size: 16px;
+  }
+
+  .persian-area {
+    bottom: 50px;
+  }
+
+  #controls {
+    height: 70px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  #slide-slider {
+    width: 60%;
+  }
+
+  #controls .btn-ar {
+    font-size: 16px;
+  }
+
+  #controls .btn-fa {
+    font-size: 14px;
+  }
 }
