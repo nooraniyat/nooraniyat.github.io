@@ -29,13 +29,13 @@ body {
   font-family: SamimV1, sans-serif;
   background: #fafafa;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: 100vh;
   direction: rtl;
+
+  /* FIXED */
+  min-height: 100dvh; /* better than 100vh for phones */
+  display: flex;
 }
+
 
 /* ================================================= */
 /* ================= MOBILE FIX ==================== */
@@ -44,11 +44,16 @@ body {
 @media (max-width: 768px) {
 
   /* stack layout vertically */
-  #container {
-    flex-direction: column;
-    padding: 10px;
-    gap: 6px;
-  }
+ #container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  min-height: 100dvh;
+
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 
   /* sidebar full width on top */
   #dua-list {
@@ -67,7 +72,7 @@ body {
 
   /* smaller Arabic text */
   .arabic-line {
-    font-size: 32px;
+    font-size: clamp(26px, 5vw, 60px);
     line-height: 2;
   }
 
@@ -240,7 +245,7 @@ body {
 
 .arabic-line {
   font-family: NotoNaskhArabic, QuranTaha, serif;
-  font-size: 60px;
+  font-size: clamp(26px, 5vw, 60px);
 }
 
 /* ⭐ Persian translation (gray) */
