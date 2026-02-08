@@ -37,6 +37,69 @@ body {
   direction: rtl;
 }
 
+/* ================================================= */
+/* ================= MOBILE FIX ==================== */
+/* ================================================= */
+
+@media (max-width: 768px) {
+
+  /* stack layout vertically */
+  #container {
+    flex-direction: column;
+    padding: 10px;
+    gap: 6px;
+  }
+
+  /* sidebar full width on top */
+  #dua-list {
+    width: 100%;
+    max-height: 35vh;
+  }
+
+  /* smaller title */
+  #dua-name {
+    font-size: 22px;
+  }
+
+  #dua-name .persian {
+    font-size: 18px;
+  }
+
+  /* smaller Arabic text */
+  .arabic-line {
+    font-size: 32px;
+    line-height: 2;
+  }
+
+  /* smaller translation/meta */
+  .translation,
+  .meta-line {
+    font-size: 16px;
+  }
+
+  /* reduce bottom spacing */
+  .persian-area {
+    bottom: 50px;
+  }
+
+  /* smaller controls */
+  #controls {
+    height: 70px;
+    gap: 6px;
+  }
+
+  #slide-slider {
+    width: 180px;
+  }
+
+  #controls .btn-ar {
+    font-size: 16px;
+  }
+
+  #controls .btn-fa {
+    font-size: 14px;
+  }
+}
 
 
 /* ================================================= */
