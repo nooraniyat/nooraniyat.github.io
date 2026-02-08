@@ -243,8 +243,6 @@ body {
   transform: scaleX(-1);
 }
 
-
-
 /* ================================================= */
 /* ================= MOBILE ONLY =================== */
 /* ================================================= */
@@ -257,7 +255,8 @@ body {
 
   #container {
     flex-direction: column;
-    padding: 10px;
+    padding: 8px;
+    gap: 8px;
   }
 
   #dua-list {
@@ -275,7 +274,7 @@ body {
 
   .arabic-line {
     font-size: 32px;
-    line-height: 2;
+    line-height: 1.9;
   }
 
   .translation,
@@ -287,21 +286,35 @@ body {
     bottom: 50px;
   }
 
+  /* ===== Slim mobile control bar ===== */
+
   #controls {
-    height: 70px;
+    height: 48px;
+    min-height: 48px;
+    padding: 4px 6px;
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
-  #slide-slider {
-    width: 60%;
+  #controls button {
+    padding: 4px 8px;
   }
 
   #controls .btn-ar {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   #controls .btn-fa {
-    font-size: 14px;
+    font-size: 12px;
+  }
+
+  #slide-counter {
+    font-size: 13px;
+    min-width: 55px;
+  }
+
+  #slide-slider {
+    width: 50%;
+    height: 4px;
   }
 }
