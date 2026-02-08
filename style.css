@@ -1,0 +1,254 @@
+/* ================================================= */
+/* ==================== FONTS ====================== */
+/* ================================================= */
+
+@font-face {
+  font-family: SamimV1;
+  src: url('assets/fonts/Samim-v0.10.3.woff') format('woff'),
+       url('assets/fonts/Samim-v0.10.3.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: NotoNaskhArabic;
+  src: url('assets/fonts/NotoNaskhArabic-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: QuranTaha;
+  src: url('assets/fonts/QuranTaha.ttf') format('truetype');
+}
+
+
+
+/* ================================================= */
+/* ================= PAGE LAYOUT =================== */
+/* ================================================= */
+
+body {
+  margin: 0;
+  font-family: SamimV1, sans-serif;
+  background: #fafafa;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100vh;
+  direction: rtl;
+}
+
+
+
+/* ================================================= */
+/* ================= CONTAINER ===================== */
+/* ================================================= */
+
+#container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 40px 60px;
+  box-sizing: border-box;
+}
+
+
+
+/* ================================================= */
+/* ================= SIDEBAR ======================= */
+/* ================================================= */
+
+#dua-list {
+  width: 220px;
+  overflow-y: auto;
+}
+
+#dua-list button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 6px;
+  font-family: SamimV1;
+  cursor: pointer;
+}
+
+
+
+/* ================================================= */
+/* ================= SCREEN ======================== */
+/* hidden until dua selected                         */
+/* ================================================= */
+
+#screen {
+  flex: 1;
+  display: none; /* ⭐ start hidden */
+  flex-direction: column;
+}
+
+
+
+/* ================================================= */
+/* ================= DUA NAME ====================== */
+/* ================================================= */
+
+#dua-name {
+  text-align: center;
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+#dua-name .arabic {
+  font-family: NotoNaskhArabic, QuranTaha, serif;
+}
+
+#dua-name .persian {
+  font-family: SamimV1;
+  font-size: 28px;
+  color: #555;
+}
+
+
+
+/* ================================================= */
+/* =============== CONTENT (DECORATED) ============== */
+/* ================================================= */
+
+#dua-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+
+  padding: 20px 40px;
+
+  background-color: #fff;
+
+  background-image:
+    url('assets/images/c4.gif'),
+    url('assets/images/c1.gif'),
+    url('assets/images/c3.gif'),
+    url('assets/images/c2.gif'),
+    url('assets/images/h2.gif'),
+    url('assets/images/h2.gif'),
+    url('assets/images/ho2.gif'),
+    url('assets/images/ho2.gif');
+
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat,
+    repeat-y, repeat-y, repeat-x, repeat-x;
+
+  background-position:
+    top left, top right, bottom left, bottom right,
+    left top, right top, top left, bottom left;
+
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+
+
+/* ================================================= */
+/* ================= SLIDES ======================== */
+/* ================================================= */
+
+.slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.arabic-area {
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.persian-area {
+  position: absolute;
+  bottom: 80px;
+  width: 100%;
+}
+
+
+
+/* ================================================= */
+/* ================= TEXT ========================== */
+/* ================================================= */
+
+.arabic-line {
+  font-family: NotoNaskhArabic, QuranTaha, serif;
+  font-size: 60px;
+}
+
+/* ⭐ Persian translation (gray) */
+.translation {
+  font-family: SamimV1;
+  font-size: 20px;
+  color: #6b6b6b;   /* gray */
+}
+
+
+/* ⭐ Meta line (blue) */
+.meta-line {
+  font-family: SamimV1;
+  font-size: 20px;
+  color: #1e40af;   /* blue */
+}
+
+
+
+/* ================================================= */
+/* ================= CONTROLS ====================== */
+/* ================================================= */
+
+#controls {
+  height: 100px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  background: #fafafa;
+}
+
+
+
+/* ⭐ RESTORED BUTTON FONTS ⭐ */
+
+#controls button {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 8px 14px;
+}
+
+#controls .btn-ar {
+  font-family: NotoNaskhArabic, QuranTaha, serif;
+  font-size: 20px;
+}
+
+#controls .btn-fa {
+  font-family: SamimV1;
+  font-size: 18px;
+  color: #555;
+}
+
+
+
+/* ================================================= */
+/* ================= SLIDER ======================== */
+/* ================================================= */
+
+#slide-counter {
+  min-width: 80px;
+  text-align: center;
+}
+
+#slide-slider {
+  width: 300px;
+  direction: rtl;
+  transform: scaleX(-1);
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nooraniyat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="container">
+
+    <!-- Sidebar -->
+    <div id="dua-list"></div>
+
+    <!-- Main screen -->
+    <div id="screen">
+
+      <!-- Dua name -->
+      <h2 id="dua-name"></h2>
+
+      <!-- Slides injected here -->
+      <div id="dua-content"></div>
+
+      <!-- Controls -->
+      <div id="controls">
+        <button id="prev-slide">
+          <span class="btn-ar">السابق</span>
+          <span class="btn-fa">(قبلی)</span>
+        </button>
+        <input type="range" id="slide-slider" min="1" max="1" value="1" step="1"/>
+        <span id="slide-counter">0 / 0</span>
+        <button id="next-slide">
+          <span class="btn-ar">التالي</span>
+          <span class="btn-fa">(بعدی)</span>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
