@@ -18,7 +18,7 @@ const slideCounter = document.getElementById("slide-counter");
 const slideSlider = document.getElementById("slide-slider");
 const duaNameEl = document.getElementById("dua-name");
 const screenEl = document.getElementById("screen");
-const homeBtn = document.getElementById("home-btn"); // added Home button reference
+const homeBtn = document.getElementById("home-btn"); // Home button reference
 
 
 /* =================================================
@@ -88,7 +88,7 @@ function showSlide(index, updateURL = true) {
   nextBtn.disabled = index === currentLines.length - 1;
 
   /* ⭐ URL update (?name=folder&id=slide) */
-  if (updateURL) {
+  if (updateURL && currentFolder) {
     const params = new URLSearchParams();
     params.set("name", currentFolder);
     params.set("id", index + 1);
@@ -107,7 +107,9 @@ async function displayDua(folder, slideIndex = 0) {
   /* show screen / hide sidebar */
   duaListEl.style.display = "none";
   screenEl.style.display = "flex";
-  if (homeBtn) homeBtn.style.display = "inline-flex"; // show Home button
+
+  // show home button
+  if (homeBtn) homeBtn.style.display = "inline-flex";
 
   const arJson = await fetchJSON(`${dbFolder}/${folder}/text.json`);
   const faJson = await fetchJSON(`${dbFolder}/${folder}/translation-fa.json`);
@@ -204,7 +206,7 @@ slideSlider.addEventListener("input", () => {
 
 
 /* =================================================
-   HOME BUTTON
+   HOME BUTTON FUNCTION
 ================================================= */
 
 function goHome() {
@@ -224,8 +226,6 @@ function goHome() {
   history.replaceState(null, "", window.location.pathname);
 }
 
-if (homeBtn) homeBtn.onclick = goHome;
-
 
 /* =================================================
    INIT
@@ -234,14 +234,19 @@ if (homeBtn) homeBtn.onclick = goHome;
 async function init() {
   /* ⭐ start with screen hidden */
   screenEl.style.display = "none";
-  if (homeBtn) homeBtn.style.display = "none"; // hide home initially
+
+  // hide home initially & attach click
+  if (homeBtn) {
+    homeBtn.style.display = "none";
+    homeBtn.onclick = goHome;
+  }
 
   await loadDuaList();
 
   /* support direct URL open */
   const params = new URLSearchParams(window.location.search);
   const nameParam = params.get("name");
-  const idParam = parseInt(params.get("id")) || 1;
+  const idParam = parseInt(params.get("id"), 10) || 1;
 
   if (nameParam) {
     displayDua(nameParam, idParam - 1);
