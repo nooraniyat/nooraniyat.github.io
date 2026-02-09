@@ -281,7 +281,6 @@ async function init() {
   goHome();
 }
 
-  }
-}
-
+// call init
 init();
+
