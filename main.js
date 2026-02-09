@@ -29,6 +29,7 @@ const contrastBtn = document.getElementById("contrast-btn");
 let currentLines = [];
 let currentSlide = 0;
 let currentFolder = "";
+let isDarkMode = false;
 
 
 /* =================================================
@@ -88,7 +89,6 @@ function showSlide(index, updateURL = true) {
   prevBtn.disabled = index === 0;
   nextBtn.disabled = index === currentLines.length - 1;
 
-  /* ⭐ URL update (?name=folder&id=slide) */
   if (updateURL && currentFolder) {
     const params = new URLSearchParams();
     params.set("name", currentFolder);
@@ -114,7 +114,11 @@ async function displayDua(folder, slideIndex = 0) {
 
   const arJson = await fetchJSON(`${dbFolder}/${folder}/text.json`);
   const faJson = await fetchJSON(`${dbFolder}/${folder}/translation-fa.json`);
-  if (!arJson) return;
+  if (!arJson) {
+    // if JSON not found, go back home
+    goHome();
+    return;
+  }
 
   /* =================================================
      TITLE (Arabic + Persian)
@@ -150,16 +154,15 @@ async function displayDua(folder, slideIndex = 0) {
     meta: metaLines.find(m => m.id === id) || null
   }));
 
-
   /* =================================================
      SLIDER SETUP
   ================================================= */
 
   slideSlider.min = 1;
   slideSlider.max = currentLines.length;
-  slideSlider.value = currentLines.length - slideIndex;
+  slideSlider.value = Math.max(1, currentLines.length - slideIndex);
 
-  showSlide(slideIndex, false);
+  showSlide(Math.max(0, slideIndex), false);
 }
 
 
@@ -182,7 +185,6 @@ async function loadDuaList() {
 
     const btn = document.createElement("button");
 
-    /* Arabic + Persian fonts */
     btn.innerHTML = faName
       ? `<span class="btn-ar">${arName}</span> <span class="btn-fa">(${faName})</span>`
       : `<span class="btn-ar">${arName}</span>`;
@@ -211,28 +213,22 @@ slideSlider.addEventListener("input", () => {
 ================================================= */
 
 function goHome() {
-  // show sidebar / hide screen
   duaListEl.style.display = "block";
   screenEl.style.display = "none";
 
-  // hide home button
   if (homeBtn) homeBtn.style.display = "none";
 
-  // reset state
   currentLines = [];
   currentSlide = 0;
   currentFolder = "";
 
-  // clean URL
   history.replaceState(null, "", window.location.pathname);
 }
+
 
 /* =================================================
    CONTRAST / DARK MODE BUTTON
 ================================================= */
-
-const contrastBtn = document.getElementById("contrast-btn");
-let isDarkMode = false;
 
 function toggleContrast() {
   isDarkMode = !isDarkMode;
@@ -246,33 +242,40 @@ function toggleContrast() {
   }
 }
 
-if (contrastBtn) contrastBtn.onclick = toggleContrast;
-
-
 
 /* =================================================
    INIT
 ================================================= */
 
 async function init() {
-  /* ⭐ start with screen hidden */
+  // start with screen hidden
   screenEl.style.display = "none";
 
-  // hide home initially & attach click
+  // hide home & contrast initially, attach clicks
   if (homeBtn) {
     homeBtn.style.display = "none";
     homeBtn.onclick = goHome;
   }
 
+  if (contrastBtn) {
+    contrastBtn.onclick = toggleContrast;
+  }
+
   await loadDuaList();
 
-  /* support direct URL open */
+  // support direct URL open
   const params = new URLSearchParams(window.location.search);
   const nameParam = params.get("name");
   const idParam = parseInt(params.get("id"), 10) || 1;
 
   if (nameParam) {
-    displayDua(nameParam, idParam - 1);
+    // check if folder exists in manifest
+    const folders = await fetchJSON(manifestFile) || [];
+    if (folders.includes(nameParam)) {
+      displayDua(nameParam, idParam - 1);
+    } else {
+      goHome(); // fallback if invalid folder
+    }
   }
 }
 
