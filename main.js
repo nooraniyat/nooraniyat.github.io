@@ -261,6 +261,7 @@ async function init() {
     contrastBtn.onclick = toggleContrast;
   }
 
+  // load sidebar list
   await loadDuaList();
 
   // support direct URL open
@@ -269,18 +270,17 @@ async function init() {
   const idParam = parseInt(params.get("id"), 10) || 1;
 
   if (nameParam) {
-  // try to open the requested dua
-  const folders = await fetchJSON(manifestFile) || [];
-  if (folders.includes(nameParam)) {
-       displayDua(nameParam, idParam - 1);
-       return; // done
-     }
-   }
-   
-   // if no valid dua in URL, show the list
-   goHome();
-
+    const folders = await fetchJSON(manifestFile) || [];
+    if (folders.includes(nameParam)) {
+      displayDua(nameParam, idParam - 1);
+      return; // stop fallback
     }
+  }
+
+  // fallback: show list if no valid URL
+  goHome();
+}
+
   }
 }
 
