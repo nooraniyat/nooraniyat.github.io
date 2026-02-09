@@ -18,6 +18,7 @@ const slideCounter = document.getElementById("slide-counter");
 const slideSlider = document.getElementById("slide-slider");
 const duaNameEl = document.getElementById("dua-name");
 const screenEl = document.getElementById("screen");
+const homeBtn = document.getElementById("home-btn"); // added Home button reference
 
 
 /* =================================================
@@ -106,6 +107,7 @@ async function displayDua(folder, slideIndex = 0) {
   /* show screen / hide sidebar */
   duaListEl.style.display = "none";
   screenEl.style.display = "flex";
+  if (homeBtn) homeBtn.style.display = "inline-flex"; // show Home button
 
   const arJson = await fetchJSON(`${dbFolder}/${folder}/text.json`);
   const faJson = await fetchJSON(`${dbFolder}/${folder}/translation-fa.json`);
@@ -124,7 +126,7 @@ async function displayDua(folder, slideIndex = 0) {
 
 
   /* =================================================
-     ⭐ BUILD SLIDES FROM ALL IDS (FIXED META BUG)
+     BUILD SLIDES FROM ALL IDS (FIXED META BUG)
   ================================================= */
 
   const arLines = arJson.lines || [];
@@ -202,12 +204,37 @@ slideSlider.addEventListener("input", () => {
 
 
 /* =================================================
+   HOME BUTTON
+================================================= */
+
+function goHome() {
+  // show sidebar / hide screen
+  duaListEl.style.display = "block";
+  screenEl.style.display = "none";
+
+  // hide home button
+  if (homeBtn) homeBtn.style.display = "none";
+
+  // reset state
+  currentLines = [];
+  currentSlide = 0;
+  currentFolder = "";
+
+  // clean URL
+  history.replaceState(null, "", window.location.pathname);
+}
+
+if (homeBtn) homeBtn.onclick = goHome;
+
+
+/* =================================================
    INIT
 ================================================= */
 
 async function init() {
   /* ⭐ start with screen hidden */
   screenEl.style.display = "none";
+  if (homeBtn) homeBtn.style.display = "none"; // hide home initially
 
   await loadDuaList();
 
