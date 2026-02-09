@@ -269,12 +269,17 @@ async function init() {
   const idParam = parseInt(params.get("id"), 10) || 1;
 
   if (nameParam) {
-    // check if folder exists in manifest
-    const folders = await fetchJSON(manifestFile) || [];
-    if (folders.includes(nameParam)) {
-      displayDua(nameParam, idParam - 1);
-    } else {
-      goHome(); // fallback if invalid folder
+  // try to open the requested dua
+  const folders = await fetchJSON(manifestFile) || [];
+  if (folders.includes(nameParam)) {
+       displayDua(nameParam, idParam - 1);
+       return; // done
+     }
+   }
+   
+   // if no valid dua in URL, show the list
+   goHome();
+
     }
   }
 }
