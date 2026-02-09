@@ -18,7 +18,8 @@ const slideCounter = document.getElementById("slide-counter");
 const slideSlider = document.getElementById("slide-slider");
 const duaNameEl = document.getElementById("dua-name");
 const screenEl = document.getElementById("screen");
-const homeBtn = document.getElementById("home-btn"); // Home button reference
+const homeBtn = document.getElementById("home-btn");
+const contrastBtn = document.getElementById("contrast-btn");
 
 
 /* =================================================
@@ -225,6 +226,28 @@ function goHome() {
   // clean URL
   history.replaceState(null, "", window.location.pathname);
 }
+
+/* =================================================
+   CONTRAST / DARK MODE BUTTON
+================================================= */
+
+const contrastBtn = document.getElementById("contrast-btn");
+let isDarkMode = false;
+
+function toggleContrast() {
+  isDarkMode = !isDarkMode;
+
+  if (isDarkMode) {
+    document.body.style.backgroundColor = "#000";
+    document.body.style.color = "#fff";
+  } else {
+    document.body.style.backgroundColor = "#fff";
+    document.body.style.color = "#000";
+  }
+}
+
+if (contrastBtn) contrastBtn.onclick = toggleContrast;
+
 
 
 /* =================================================
