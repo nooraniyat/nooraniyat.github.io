@@ -66,6 +66,8 @@ body {
   margin-bottom: 6px;
   font-family: SamimV1;
   cursor: pointer;
+  background: inherit;
+  color: inherit;
 }
 
 
@@ -114,11 +116,10 @@ body {
   position: relative;
   overflow: hidden;
   text-align: center;
-
   padding: 20px 40px;
 
-  background-color: #fff;
-
+  background-color: inherit; /* <- changed from #fff */
+  
   background-image:
     url('assets/images/c4.gif'),
     url('assets/images/c1.gif'),
@@ -139,6 +140,7 @@ body {
 
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
 
 
 
@@ -175,18 +177,19 @@ body {
 .arabic-line {
   font-family: NotoNaskhArabic, QuranTaha, serif;
   font-size: 60px;
+  color: inherit;
 }
 
 .translation {
   font-family: SamimV1;
   font-size: 20px;
-  color: #6b6b6b;
+  color: inherit;
 }
 
 .meta-line {
   font-family: SamimV1;
   font-size: 20px;
-  color: #1e40af;
+  color: inherit;
 }
 
 
@@ -262,14 +265,18 @@ body {
   #dua-list {
     width: 100%;
     max-height: 35dvh;
+    background: inherit;
+    color: inherit;
   }
 
   #dua-name {
     font-size: 22px;
+    color: inherit;
   }
 
   #dua-name .persian {
     font-size: 18px;
+    color: inherit;
   }
 
   .arabic-line {
@@ -294,6 +301,7 @@ body {
     padding: 4px 6px;
     gap: 6px;
     flex-wrap: nowrap;
+    background: inherit;
   }
 
   #controls button {
@@ -306,6 +314,7 @@ body {
 
   #controls .btn-fa {
     font-size: 12px;
+    color: inherit;
   }
 
   #slide-counter {
