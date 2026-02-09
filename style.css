@@ -285,23 +285,23 @@ body.dark-mode #controls button {
   }
 
   #dua-name {
-    font-size: 22px;
+    font-size: 16px;
     color: inherit;
   }
 
   #dua-name .persian {
-    font-size: 18px;
+    font-size: 14px;
     color: inherit;
   }
 
   .arabic-line {
-    font-size: 32px;
-    line-height: 1.9;
+    font-size: 26px;
+    line-height: 1.8;
   }
 
   .translation,
   .meta-line {
-    font-size: 16px;
+    font-size: 12px;
   }
 
   .persian-area {
@@ -326,16 +326,16 @@ body.dark-mode #controls button {
   }
 
   #controls .btn-ar {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   #controls .btn-fa {
-    font-size: 12px;
+    font-size: 10px;
     color: inherit;
   }
 
   #slide-counter {
-    font-size: 13px;
+    font-size: 12px;
     min-width: 55px;
     color: inherit;
   }
