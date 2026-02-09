@@ -236,6 +236,27 @@ function toggleContrast() {
   document.body.classList.toggle("dark-mode", isDarkMode);
 }
 
+/* =================================================
+   KEYBOARD CONTROLS
+================================================= */
+
+document.addEventListener("keydown", (e) => {
+  // Left arrow or Page Up -> previous slide
+  if (e.key === "ArrowLeft" || e.key === "PageUp") {
+    showSlide(currentSlide - 1);
+  }
+
+  // Right arrow or Page Down -> next slide
+  if (e.key === "ArrowRight" || e.key === "PageDown") {
+    showSlide(currentSlide + 1);
+  }
+
+  // Home key -> go back to list
+  if (e.key === "Home") {
+    goHome();
+  }
+});
+
 
 /* =================================================
    INIT
