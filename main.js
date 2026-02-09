@@ -232,14 +232,8 @@ function goHome() {
 
 function toggleContrast() {
   isDarkMode = !isDarkMode;
-
-  if (isDarkMode) {
-    document.body.style.backgroundColor = "#000";
-    document.body.style.color = "#fff";
-  } else {
-    document.body.style.backgroundColor = "#fff";
-    document.body.style.color = "#000";
-  }
+  // toggle dark-mode class on body
+  document.body.classList.toggle("dark-mode", isDarkMode);
 }
 
 
@@ -283,4 +277,3 @@ async function init() {
 
 // call init
 init();
-
