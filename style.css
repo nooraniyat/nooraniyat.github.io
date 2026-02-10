@@ -99,7 +99,7 @@ body.dark-mode #dua-list button {
 
 #dua-name {
   text-align: center;
-  font-size: 36px;
+  font-size: 26px;
   margin: 10px 0;
   color: inherit;
 }
@@ -110,7 +110,7 @@ body.dark-mode #dua-list button {
 
 #dua-name .persian {
   font-family: SamimV1;
-  font-size: 28px;
+  font-size: 26px;
   color: inherit;
 }
 
@@ -126,7 +126,7 @@ body.dark-mode #dua-list button {
   text-align: center;
   padding: 20px 40px;
 
-  background-color: inherit; /* inherit body bg so dark mode works */
+  background-color: inherit; 
   
   background-image:
     url('assets/images/c4.gif'),
@@ -230,12 +230,12 @@ body.dark-mode #dua-content {
 
 #controls .btn-ar {
   font-family: NotoNaskhArabic, QuranTaha, serif;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 #controls .btn-fa {
   font-family: SamimV1;
-  font-size: 18px;
+  font-size: 14px;
   color: inherit;
 }
 
@@ -285,17 +285,17 @@ body.dark-mode #controls button {
   }
 
   #dua-name {
-    font-size: 16px;
-    color: inherit;
-  }
-
-  #dua-name .persian {
     font-size: 14px;
     color: inherit;
   }
 
+  #dua-name .persian {
+    font-size: 12px;
+    color: inherit;
+  }
+
   .arabic-line {
-    font-size: 26px;
+    font-size: 24px;
     line-height: 1.8;
   }
 
