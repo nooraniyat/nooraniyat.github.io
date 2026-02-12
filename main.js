@@ -20,6 +20,11 @@ const duaNameEl = document.getElementById("dua-name");
 const screenEl = document.getElementById("screen");
 const homeBtn = document.getElementById("home-btn");
 const contrastBtn = document.getElementById("contrast-btn");
+const CREDIT_SLIDE = {
+  ar: { text: "التماس دعا" },
+  fa: { text: "به اهتمام علی" },
+  meta: null
+};
 
 
 /* =================================================
@@ -153,6 +158,13 @@ async function displayDua(folder, slideIndex = 0) {
     fa: faLines.find(l => l.id === id) || null,
     meta: metaLines.find(m => m.id === id) || null
   }));
+
+   /* =================================================
+         ADD FINAL CREDIT SLIDE
+      ================================================= */
+      
+      currentLines.push(CREDIT_SLIDE);
+
 
   /* =================================================
      SLIDER SETUP
