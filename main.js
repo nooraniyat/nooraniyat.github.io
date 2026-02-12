@@ -22,9 +22,11 @@ const homeBtn = document.getElementById("home-btn");
 const contrastBtn = document.getElementById("contrast-btn");
 const CREDIT_SLIDE = {
   ar: { text: "التماس دعا" },
-  fa: { text: "به اهتمام علی" },
-  meta: null
+  fa: null,
+  meta: null,
+  isCredit: true
 };
+
 
 
 /* =================================================
