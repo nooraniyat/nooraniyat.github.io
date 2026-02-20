@@ -1,0 +1,47 @@
+[
+  {
+    "uid": "dua-abu-hamza-thumali",
+    "name_ar": "دعاء أبي حمزة الثمالي",
+    "name_fa": "دعای ابوحمزه ثمالی"
+  },
+  {
+    "uid": "dua-faraj",
+    "name_ar": "دعاء الفرج",
+    "name_fa": "دعای فرج امام زمان (عج)"
+  },
+  {
+    "uid": "dua-jawshan-kabeer",
+    "name_ar": "دُعاء الجوشن الكبير",
+    "name_fa": "دعای جوشن کبیر"
+  },
+  {
+    "uid": "dua-laylat-al-qadr",
+    "name_ar": "دُعَاء رفع القرآن في ليالي القدر",
+    "name_fa": "دعای قرآن به سر گرفتن در شب قدر"
+  },
+  {
+    "uid": "dua-nudba",
+    "name_ar": "دُعَاء ٱلنُّدْبَة",
+    "name_fa": "دعای ندبه"
+  },
+  {
+    "uid": "hadith-kisa",
+    "name_ar": "حديث الكساء",
+    "name_fa": "حدیث کساء"
+  },
+  {
+    "uid": "ziyarat-ashura",
+    "name_ar": "زيارة عاشوراء",
+    "name_fa": "زیارت عاشورا"
+  },
+  {
+    "uid": "ziyarat-fatima",
+    "name_ar": "زيارة السيدة فاطمة الزهراء (ع)",
+    "name_fa": "زیارت حضرت فاطمه زهراء (س)"
+  },
+  {
+    "uid": "ziyarat-rasoul",
+    "name_ar": "زيارة رسول الله (ص)",
+    "name_fa": "زیارت حضرت رسول (ص)"
+  }
+]
