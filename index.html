@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nooraniyat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="container">
+
+    <!-- Sidebar -->
+    <div id="dua-list"></div>
+
+    <!-- Main screen -->
+    <div id="screen">
+
+      <!-- Dua Name (Top Center) -->
+      <h2 id="dua-name"></h2>
+
+      <!-- Slide Content -->
+      <div id="dua-content">
+        <div class="slide">
+
+          <!-- Meta (Top Right, under name) -->
+          <div class="meta-line"></div>
+
+          <!-- Arabic (True Center) -->
+          <div class="arabic-line"></div>
+
+          <!-- Persian (Bottom Center) -->
+          <div class="farsi-line"></div>
+
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div id="controls">
+        <button id="home-btn" title="فهرست">☰</button>
+        <button id="prev-slide" title="پیشین">▶</button>
+        <input
+          type="range"
+          id="slide-slider"
+          min="1"
+          max="1"
+          value="1"
+          step="1"
+        />
+        <span id="slide-counter">0 / 0</span>
+        <button id="next-slide" title="پسین">◀</button>
+        <button id="contrast-btn" title="روشنایی">◐</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+
+  <img
+    src="//www.clustrmaps.com/map_v2.png?d=pB2RtEP2qTQXrIIXGr9x3a60TY4Zs8CTY25OcIsfUYU&cl=ffffff"
+    width="1"
+    height="1"
+    style="opacity:0.01;"
+    alt=""
+  />
+
+</body>
+</html>
