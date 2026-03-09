@@ -190,11 +190,13 @@ body.dark-mode #dua-list button {
   display: flex;
   justify-content: center;         /* horizontal center */
   align-items: center;             /* vertical center */
+  transform: translateY(-5%);  /* move up 20% of its own height */
 
   font-family: QuranTaha, NotoNaskhArabic, serif;
   font-size: 55px;
   line-height: 1.9;
   text-align: center;
+
 }
 
 
