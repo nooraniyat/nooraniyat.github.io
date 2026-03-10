@@ -225,6 +225,7 @@ body.dark-mode #dua-list button {
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  margin-top: auto;
   gap: 10px;
   flex-shrink: 0;
 }
