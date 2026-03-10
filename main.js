@@ -80,9 +80,11 @@ function createSlideHTML(line) {
 /* =================================================
    SHOW SLIDE
 ================================================= */
-
-function showSlide(index, updateURL = true) {
+function showSlide(index, updateURL = true, fromSlider = false) {
   if (!currentLines.length || !duaContentEl) return;
+
+  // Only blur if NOT coming from slider
+  if (!fromSlider && slideSlider) slideSlider.blur();
 
   index = Math.max(0, Math.min(index, currentLines.length - 1));
   currentSlide = index;
@@ -173,10 +175,9 @@ if (prevBtn)
 if (nextBtn)
   nextBtn.onclick = () => showSlide(currentSlide + 1);
 
-if (slideSlider)
-  slideSlider.addEventListener("input", () => {
-    showSlide(currentLines.length - Number(slideSlider.value));
-  });
+slideSlider.addEventListener("input", () => {
+  showSlide(currentLines.length - Number(slideSlider.value), true, true);
+});
 
 
 /* =================================================
@@ -214,12 +215,20 @@ function toggleContrast() {
 document.addEventListener("keydown", (e) => {
   if (!currentLines.length) return;
 
-  if (e.key === "ArrowLeft" || e.key === "PageUp") {
-    showSlide(currentSlide - 1);
+  if (
+    e.key === "ArrowRight" ||
+    e.key === "PageDown" ||
+    e.key === " " ||
+    e.key === "Enter"
+  ) {
+    showSlide(currentSlide + 1);
   }
 
-  if (e.key === "ArrowRight" || e.key === "PageDown") {
-    showSlide(currentSlide + 1);
+  if (
+    e.key === "ArrowLeft" ||
+    e.key === "PageUp"
+  ) {
+    showSlide(currentSlide - 1);
   }
 
   if (e.key === "Home") {
