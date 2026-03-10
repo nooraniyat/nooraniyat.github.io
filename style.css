@@ -193,7 +193,6 @@ body.dark-mode #dua-list button {
   transform: translateY(+10%);  /* move up 20% of its own height */
   font-family: QuranTaha, NotoNaskhArabic, serif;
   font-size: 60px;
-  font-weight: bold;
   line-height: 1.9;
   text-align: center;
 
