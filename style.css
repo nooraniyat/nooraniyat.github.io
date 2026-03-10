@@ -52,7 +52,7 @@ body.dark-mode {
   display: flex;
   height: 100%;
   gap: 10px;
-  padding: 40px 60px;
+  padding: 30px 40px;
   box-sizing: border-box;
   justify-content: center;
 }
