@@ -177,7 +177,7 @@ body.dark-mode #dua-list button {
 .meta-line {
   text-align: right;      /* RTL metadata usually right */
   font-family: SamimV1;
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 20px;
   flex-shrink: 0;
 }
