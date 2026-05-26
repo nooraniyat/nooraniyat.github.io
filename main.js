@@ -66,9 +66,9 @@ function createSlideHTML(line) {
 
       ${line.m ? `<div class="meta-line">${line.m}</div>` : ""}
 
-      ${line.ar ? `<div class="arabic-line">${line.ar}</div>` : ""}
+      ${line.ar ? `<div class="arabic-line">${line.ar.replace(/\n/g, "<br>")}</div>` : ""}
 
-      ${line.fa ? `<div class="farsi-line">${line.fa}</div>` : ""}
+      ${line.fa ? `<div class="farsi-line">${line.fa.replace(/\n/g, "<br>")}</div>` : ""}
 
     </div>
   `;
