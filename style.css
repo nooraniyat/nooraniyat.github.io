@@ -23,6 +23,10 @@
 /* ================= PAGE LAYOUT =================== */
 /* ================================================= */
 
+:root {
+  --farsi-font-size: 20px;
+}
+
 html, body {
   height: 100%;
 }
@@ -52,7 +56,7 @@ body.dark-mode {
   display: flex;
   height: 100%;
   gap: 10px;
-  padding: 30px 40px;
+  padding: 0;
   box-sizing: border-box;
   justify-content: center;
 }
@@ -104,7 +108,7 @@ body.dark-mode #dua-list button {
 #dua-name {
   text-align: center;
   font-size: 20px;
-  margin: 10px 0 5px 0;
+  margin: 0px 0 10px 0;
   flex-shrink: 0;
 }
 
@@ -203,7 +207,7 @@ body.dark-mode #dua-list button {
 
 .farsi-line {
   font-family: SamimV1;
-  font-size: 20px;
+  font-size: var(--farsi-font-size);
   line-height: 1.8;
 
   text-align: center;              /* FIX: centered */
@@ -224,8 +228,7 @@ body.dark-mode #dua-list button {
   height: 60px;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  margin-top: auto;
+  align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
@@ -287,7 +290,10 @@ body.dark-mode #dua-content {
     font-size: 24px;
   }
 
-  .farsi-line,
+  :root {
+    --farsi-font-size: 12px;
+  }
+
   .meta-line {
     font-size: 12px;
   }

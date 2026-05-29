@@ -20,6 +20,8 @@ const duaNameEl = document.getElementById("dua-name");
 const screenEl = document.getElementById("screen");
 const homeBtn = document.getElementById("home-btn");
 const contrastBtn = document.getElementById("contrast-btn");
+const farsiPlusBtn = document.getElementById("farsi-plus-btn");
+const farsiMinusBtn = document.getElementById("farsi-minus-btn");
 
 const CREDIT_SLIDE = {
   ar: "التماس دعا",
@@ -38,6 +40,7 @@ let currentLines = [];
 let currentSlide = 0;
 let currentFolder = "";
 let isDarkMode = false;
+let farsiFontSize = null; // lazy-init from computed style
 
 
 /* =================================================
@@ -209,6 +212,27 @@ function toggleContrast() {
 
 
 /* =================================================
+   FARSI FONT SIZE
+================================================= */
+
+function getFarsiFontSize() {
+  if (farsiFontSize === null) {
+    const val = getComputedStyle(document.documentElement)
+      .getPropertyValue("--farsi-font-size").trim();
+    farsiFontSize = parseFloat(val) || 20;
+  }
+  return farsiFontSize;
+}
+
+function setFarsiFontSize(size) {
+  farsiFontSize = Math.max(10, Math.min(60, size));
+  document.documentElement.style.setProperty(
+    "--farsi-font-size", farsiFontSize + "px"
+  );
+}
+
+
+/* =================================================
    KEYBOARD CONTROLS
 ================================================= */
 
@@ -251,6 +275,14 @@ async function init() {
 
   if (contrastBtn) {
     contrastBtn.onclick = toggleContrast;
+  }
+
+  if (farsiPlusBtn) {
+    farsiPlusBtn.onclick = () => setFarsiFontSize(getFarsiFontSize() + 2);
+  }
+
+  if (farsiMinusBtn) {
+    farsiMinusBtn.onclick = () => setFarsiFontSize(getFarsiFontSize() - 2);
   }
 
   await loadDuaList();
