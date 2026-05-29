@@ -15,6 +15,7 @@ Clean. Fast. Offline-ready. Fully JSON-driven.
 - Responsive layout  
 - RTL support  
 - Optional dark mode  
+- Adjustable Farsi font size  
 - No frameworks  
 - No dependencies  
 
@@ -92,6 +93,21 @@ Slides can be controlled using:
 - Previous / Next buttons  
 - Range slider  
 - Direct URL access  
+
+---
+
+## Font Size
+
+The Farsi text size can be adjusted at any time using the **𝐚** and **𝐀** buttons in the controls bar at the bottom of each slide:
+
+| Button | Action |
+|--------|--------|
+| 𝐚 | Decrease Farsi font size |
+| 𝐀 | Increase Farsi font size |
+
+Each click changes the size by 2px (range: 10px – 60px). The adjustment applies instantly across all slides without reloading.
+
+> Arabic text size can be adjusted using the browser's built-in zoom (`Ctrl +` / `Ctrl -`).
 
 Example:
 
