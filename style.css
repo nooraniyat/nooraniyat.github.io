@@ -492,9 +492,9 @@ body.dark-mode #dua-content::after {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  transform: translateY(calc(10% - 100px));
+  padding-bottom: 12px;
   font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
   font-size: 60px;
   line-height: 1.9;
