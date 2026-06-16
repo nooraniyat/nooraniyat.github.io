@@ -33,6 +33,8 @@
 
 :root {
   --persian-font-size: 20px;
+  --base-bg: #fdf8f0;
+  --base-bg-dark: #1a1a1a;
 }
 
 html, body {
@@ -42,7 +44,7 @@ html, body {
 
 body {
   font-family: SamimV1, sans-serif;
-  background: #fafafa;
+  background: var(--base-bg);
   color: #000;
   direction: rtl;
   display: flex;
@@ -51,7 +53,7 @@ body {
 }
 
 body.dark-mode {
-  background: #1a1a1a;
+  background: var(--base-bg-dark);
   color: #eee;
 }
 
@@ -125,16 +127,17 @@ body.dark-mode {
   overflow-x: hidden;
 
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-auto-rows: 70px;
   align-content: center;
   gap: 8px;
   padding: 20px;
 
-  background: #fafafa;
+  background: var(--base-bg);
 }
 
 body.dark-mode #dua-list,
 body.dark-mode #quran-sidebar {
-  background: #1a1a1a;
+  background: var(--base-bg-dark);
 }
 
 #dua-list button,
@@ -156,6 +159,8 @@ body.dark-mode #quran-sidebar {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   transition: background 0.15s;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 body.dark-mode #dua-list button,
@@ -326,6 +331,7 @@ body.dark-mode #city-input {
 /* ================================================= */
 
 #dua-name {
+  position: relative;
   align-self: center;
   text-align: center;
   font-size: 20px;
@@ -341,6 +347,26 @@ body.dark-mode #city-input {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+#dua-name::before,
+#dua-name::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  width: 100px;
+  pointer-events: none;
+}
+
+#dua-name::before {
+  right: calc(100% + 10px);
+  background: linear-gradient(to right, transparent, rgba(180, 150, 60, 0.55));
+}
+
+#dua-name::after {
+  left: calc(100% + 10px);
+  background: linear-gradient(to left, transparent, rgba(180, 150, 60, 0.55));
+}
+
 #dua-name:empty {
   display: none;
 }
@@ -348,6 +374,14 @@ body.dark-mode #city-input {
 body.dark-mode #dua-name {
   background: rgba(25, 20, 10, 0.88);
   border-color: rgba(150, 130, 70, 0.4);
+}
+
+body.dark-mode #dua-name::before {
+  background: linear-gradient(to right, transparent, rgba(150, 120, 40, 0.45));
+}
+
+body.dark-mode #dua-name::after {
+  background: linear-gradient(to left, transparent, rgba(150, 120, 40, 0.45));
 }
 
 
@@ -360,7 +394,7 @@ body.dark-mode #dua-name {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background-color: inherit;
 }
 
@@ -373,8 +407,9 @@ body.dark-mode #dua-name {
 
   --bracket-color: rgba(160, 120, 40, 0.70);
   --arm: 64px;
-  --th:  4px;
+  --th:  8px;
   --off: 14px;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 12px rgba(0, 0, 0, 0.4));
 
   background-image:
     linear-gradient(var(--bracket-color), var(--bracket-color)),  /* top-left  H */
@@ -403,6 +438,7 @@ body.dark-mode #dua-name {
 
 body.dark-mode #dua-content::after {
   --bracket-color: rgba(200, 160, 60, 0.50);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(0, 0, 0, 0.6));
 }
 
 
@@ -453,13 +489,23 @@ body.dark-mode #dua-content::after {
 .arabic-line {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   transform: translateY(+10%);
   font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
   font-size: 60px;
   line-height: 1.9;
   text-align: center;
+}
+
+.arabic-line::after {
+  content: '';
+  display: block;
+  height: 1px;
+  width: 60%;
+  margin-top: 12px;
+  background: linear-gradient(to right, transparent, rgba(180, 150, 40, 0.7) 30%, rgba(180, 150, 40, 0.7) 70%, transparent);
 }
 
 .persian-line {

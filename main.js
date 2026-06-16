@@ -53,7 +53,8 @@ const bgSharpEl       = document.getElementById("bg-sharp");
 const currentTimeEl   = document.getElementById("current-time");
 const controlsCenterEl = document.getElementById("controls-center");
 
-const CREDIT_SLIDE = { ar: "التماس دعا", fa: null, m: null, isCredit: true };
+const CREDIT_SLIDE       = { ar: "التماس دعا",           fa: null, m: null, isCredit: true };
+const QURAN_CREDIT_SLIDE = { ar: "صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم", fa: null, m: null, isCredit: true };
 
 
 /* =================================================
@@ -336,6 +337,7 @@ async function loadQuranSurah(surahNum, updateURL = true) {
     ayah: v.verse_number
   }));
 
+  quranVerses  = [...quranVerses, QURAN_CREDIT_SLIDE];
   currentLines = quranVerses;
   currentSlide = 0;
 
@@ -355,6 +357,12 @@ function showQuranVerse(index) {
   if (!quranVerses.length) return;
   index = Math.max(0, Math.min(index, quranVerses.length - 1));
   currentSlide = index;
+
+  if (quranVerses[index].isCredit) {
+    quranViewEl.innerHTML = createSlideHTML(quranVerses[index]);
+    updateNavUI();
+    return;
+  }
 
   const v = quranVerses[index];
 
