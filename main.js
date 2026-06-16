@@ -533,7 +533,7 @@ function toggleCalendar() {
 ================================================= */
 
 async function loadBackground() {
-  const manifest = await fetchJSON(`media/backgrounds.json`);
+  const manifest = await fetchJSON(`media/background/backgrounds.json`);
   if (!manifest || !Array.isArray(manifest)) return;
 
   // Fetch Hijri date independently if calendar hasn't been loaded yet
