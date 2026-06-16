@@ -214,14 +214,18 @@ function showSlide(index, updateURL = true, fromSlider = false) {
   if (updateURL && currentView === "quran" && currentSurah) {
     const params = new URLSearchParams();
     params.set("quran", currentSurah);
-    params.set("id", index + 1);
+    const hasBismillah = currentLines[0]?.isBismillah;
+    params.set("id", hasBismillah ? index : index + 1);
     history.replaceState(null, "", "?" + params.toString());
   }
 }
 
 function updateNavUI() {
+  const hasBismillah = currentLines.length > 0 && currentLines[0]?.isBismillah;
+  const displayNum   = hasBismillah ? currentSlide : currentSlide + 1;
+  const displayTotal = hasBismillah ? currentLines.length - 1 : currentLines.length;
   if (slideCounter)
-    slideCounter.textContent = `${toFaDigits(currentSlide + 1)} / ${toFaDigits(currentLines.length)}`;
+    slideCounter.textContent = `${toFaDigits(displayNum)} / ${toFaDigits(displayTotal)}`;
   if (slideSlider)
     slideSlider.value = currentLines.length - currentSlide;
   if (prevBtn) prevBtn.disabled = currentSlide === 0;
@@ -345,7 +349,7 @@ async function loadQuranSurah(surahNum, updateURL = true) {
 
   const needsBismillah = surahNum !== 1 && surahNum !== 9;
   quranVerses = needsBismillah
-    ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: null, isBismillah: true, surah: surahNum, ayah: 0 }, ...verses, QURAN_CREDIT_SLIDE]
+    ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: "به نام خداوند بخشنده و مهربان", isBismillah: true, surah: surahNum, ayah: 0 }, ...verses, QURAN_CREDIT_SLIDE]
     : [...verses, QURAN_CREDIT_SLIDE];
   currentLines = quranVerses;
   currentSlide = 0;
@@ -369,6 +373,8 @@ function showQuranVerse(index) {
 
   if (quranVerses[index].isCredit) {
     quranViewEl.innerHTML = createSlideHTML(quranVerses[index]);
+    stopAudio();
+    updateFontSizeBtns();
     updateNavUI();
     return;
   }
@@ -381,6 +387,7 @@ function showQuranVerse(index) {
     quranViewEl.innerHTML = `
       <div class="slide">
         <div class="arabic-line">${v.ar}</div>
+        <div class="persian-line">${v.fa}</div>
       </div>
     `;
   } else {
@@ -393,6 +400,7 @@ function showQuranVerse(index) {
   }
 
   audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
+  updateFontSizeBtns();
 
   if (wasAutoPlaying) {
     isAutoPlaying = true;
@@ -625,7 +633,8 @@ function updateFontSizeBtns() {
 
   const show = (currentView === "dua"   && currentLines.length > 0  && !duaListOpen) ||
                (currentView === "quran" && quranVerses.length > 0   && !quranListOpen);
-  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen;
+  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen
+    && !quranVerses[currentSlide]?.isCredit;
 
   persianPlusBtn.classList.toggle("hidden", !show);
   persianMinusBtn.classList.toggle("hidden", !show);
@@ -874,14 +883,15 @@ async function init() {
   const params     = new URLSearchParams(window.location.search);
   const nameParam  = params.get("name");
   const quranParam = parseInt(params.get("quran"), 10);
-  const idParam    = parseInt(params.get("id"), 10) || 1;
+  const idRaw      = params.get("id");
+  const idParam    = idRaw !== null ? parseInt(idRaw, 10) : null;
   const listParam  = params.get("list");
 
   if (nameParam) {
     const folders   = await fetchJSON(manifestFile) || [];
     const validUids = folders.map(f => f.uid);
     if (validUids.includes(nameParam)) {
-      await displayDua(nameParam, idParam - 1);
+      await displayDua(nameParam, idParam !== null ? idParam - 1 : 0);
       return;
     }
   }
@@ -898,7 +908,9 @@ async function init() {
     updateFontSizeBtns();
     await loadQuranSurahs();
     await loadQuranSurah(quranParam, false);
-    showSlide(idParam - 1, true);
+    const hasBismillahInit = quranVerses[0]?.isBismillah;
+    const slideIndex = idParam !== null ? (hasBismillahInit ? idParam : idParam - 1) : 0;
+    showSlide(Math.max(0, slideIndex), true);
     return;
   }
 

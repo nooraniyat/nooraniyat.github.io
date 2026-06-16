@@ -28,10 +28,11 @@ The app supports four display modes, switchable from the floating control bar:
 - Audio recitation via everyayah.com (Abdul Basit Murattal)
 - **Auto-advance playback** — after each verse ends, the next verse loads and plays automatically after a 1-second pause; pressing pause stops auto-advance
 - Audio stops automatically when switching views or opening the surah list
-- **Bismillah on its own slide** — بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ appears as a dedicated first slide with its own audio recitation (`{surah}000.mp3`) for all surahs except Al-Fatiha (1) and At-Tawbah (9)
-- Closing slide: **صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم** with Persian translation appended after the last verse
+- **Bismillah on its own slide** — بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ appears as a dedicated first slide with Persian translation "به نام خداوند بخشنده و مهربان" and its own audio recitation (`{surah}000.mp3`) for all surahs except Al-Fatiha (1) and At-Tawbah (9)
+- **Bismillah numbered as slide 0** — the counter starts at ۰ for Bismillah, ۱ for the first verse; surahs without Bismillah start at ۱ as normal
+- Closing slide: **صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم** with Persian translation appended after the last verse; audio play button is hidden on this slide
 - Amiri Quran font for complete Arabic glyph coverage
-- Deep-link URL: `?quran=<surah>&id=<verse>`
+- Deep-link URL: `?quran=<surah>&id=<n>` where `n` is 0 for Bismillah, 1 for verse 1
 
 ### Dua Slideshow
 - JSON-driven dua files loaded from `db/`
@@ -217,7 +218,7 @@ The app uses `history.replaceState` — no page reloads, bookmarkable deep links
 | `?list=dua` | Dua list overlay open |
 | `?list=quran` | Quran surah list overlay open |
 | `?name=<uid>&id=<n>` | Dua `uid` at slide `n` (1-based) |
-| `?quran=<surah>&id=<n>` | Quran surah at verse `n` (1-based) |
+| `?quran=<surah>&id=<n>` | Quran surah at verse `n`; `id=0` for Bismillah, `id=1` for first verse |
 
 On page load, `init()` reads `URLSearchParams` and restores the matching state.
 
