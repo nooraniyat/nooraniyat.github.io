@@ -1,0 +1,20 @@
+{
+  "name": "Nooraniyat",
+  "short_name": "Nooraniyat",
+  "description": "Islamic dashboard — Quran reader, duas, prayer times, and Hijri calendar",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fdf8f0",
+  "theme_color": "#c8b97a",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

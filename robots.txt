@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nooraniyat.github.io/sitemap.xml
