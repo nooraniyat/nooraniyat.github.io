@@ -4,8 +4,16 @@
 
 @font-face {
   font-family: SamimV1;
+  font-weight: normal;
   src: url('assets/fonts/Samim-v0.10.3.woff') format('woff'),
        url('assets/fonts/Samim-v0.10.3.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: SamimV1;
+  font-weight: bold;
+  src: url('assets/fonts/Samim-v0.10.3-Bold.woff') format('woff'),
+       url('assets/fonts/Samim-v0.10.3-Bold.ttf') format('truetype');
 }
 
 @font-face {
@@ -104,82 +112,91 @@ body.dark-mode {
 
 
 /* ================================================= */
-/* ================= SIDEBARS ====================== */
+/* ================= TILE OVERLAYS ================= */
 /* ================================================= */
 
 #dua-list,
 #quran-sidebar {
-  width: 220px;
-  overflow-y: auto;
-  background: inherit;
-  color: inherit;
-  flex-shrink: 0;
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  align-content: center;
+  gap: 8px;
+  padding: 72px;
+
+  background: transparent;
+}
+
+body.dark-mode #dua-list,
+body.dark-mode #quran-sidebar {
+  background: transparent;
 }
 
 #dua-list button,
 #quran-sidebar button {
-  display: block;
-  width: 100%;
-  padding: 9px 10px;
-  margin-bottom: 4px;
-  font-family: SamimV1;
-  font-size: 14px;
-  cursor: pointer;
-  background: inherit;
-  color: inherit;
-  border: 1px solid #ccc;
-  text-align: right;
-}
-
-#quran-sidebar button {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 5px 8px;
-  font-size: 12px;
-}
-
-.surah-right {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  direction: rtl;
-}
-
-.surah-num {
+  justify-content: center;
+  gap: 1px;
+  padding: 4px 6px;
   font-family: SamimV1, sans-serif;
-  font-size: 10px;
-  opacity: 0.5;
-  min-width: 18px;
-  text-align: center;
-}
-
-.surah-arabic {
-  font-family: NotoNaskhArabic, serif;
   font-size: 13px;
-}
-
-.surah-trans {
-  font-family: SamimV1, sans-serif;
-  font-size: 10px;
-  opacity: 0.6;
-  direction: ltr;
-  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  text-align: center;
+  background: rgba(255, 252, 240, 0.75);
+  border: 1px solid rgba(200, 185, 122, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.15s;
+  width: 100%;
 }
 
 body.dark-mode #dua-list button,
 body.dark-mode #quran-sidebar button {
-  border-color: #444;
+  background: rgba(35, 28, 10, 0.80);
+  border-color: rgba(150, 130, 70, 0.4);
 }
 
 #dua-list button:hover,
 #quran-sidebar button:hover {
-  background: rgba(0,0,0,0.06);
+  background: rgba(220, 200, 140, 0.55);
 }
 
 body.dark-mode #dua-list button:hover,
 body.dark-mode #quran-sidebar button:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(80, 65, 20, 0.60);
+}
+
+#quran-sidebar {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+
+#quran-sidebar button {
+  gap: 1px;
+  padding: 3px 6px;
+}
+
+.surah-num {
+  font-family: SamimV1, sans-serif;
+  font-size: 9px;
+  opacity: 0.45;
+}
+
+.surah-arabic {
+  font-family: NotoNaskhArabic, serif;
+  font-size: 12px;
+}
+
+.surah-trans {
+  font-family: SamimV1, sans-serif;
+  font-size: 9px;
+  opacity: 0.6;
 }
 
 
@@ -200,23 +217,18 @@ body.dark-mode #quran-sidebar button:hover {
 /* ============= CALENDAR / AZAN BLOCK ============= */
 /* ================================================= */
 
-/* ── outer wrapper: transparent, stacks the 3 sub-blocks ── */
+/* ── inline calendar+azan inside left FAB block ── */
 #calendar-azan-block {
   display: none;
-  position: fixed;
-  left: 66px;
-  bottom: 120px;
-  z-index: 200;
-
-  font-family: SamimV1, sans-serif;
-  font-size: 11px;
-  direction: rtl;
-  color: #333;
-
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 4px;
-  align-items: stretch;
-  width: 140px;
+  font-family: SamimV1, sans-serif;
+  font-size: 10px;
+  color: #333;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #calendar-azan-block.visible {
@@ -227,75 +239,45 @@ body.dark-mode #calendar-azan-block {
   color: #ddd;
 }
 
-/* ── shared sub-block style ── */
-#cal-city-block,
-#cal-dates,
-#azan-times {
-  background: rgba(245, 240, 225, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(200, 185, 122, 0.5);
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
-  padding: 4px 8px;
-}
-
-body.dark-mode #cal-city-block,
-body.dark-mode #cal-dates,
-body.dark-mode #azan-times {
-  background: rgba(25, 20, 10, 0.88);
-  border-color: rgba(150, 130, 70, 0.4);
-}
-
-/* ── city sub-block ── */
 #city-display {
-  display: block;
   cursor: pointer;
   text-decoration: underline dotted;
   color: #7a5c00;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
-  text-align: center;
+  white-space: nowrap;
 }
 
 body.dark-mode #city-display {
   color: #c8a040;
 }
 
-/* ── dates sub-block ── */
-#cal-dates {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  text-align: center;
-}
-
-#cal-dates span {
-  font-size: 10px;
-  line-height: 1.4;
+#cal-hijri,
+#cal-persian {
+  white-space: nowrap;
 }
 
 #cal-gregorian {
   direction: ltr;
   unicode-bidi: embed;
+  white-space: nowrap;
 }
 
 .cal-sep {
-  display: none;
+  opacity: 0.4;
+  flex-shrink: 0;
 }
 
-/* ── azan sub-block ── */
+.azan-prefix {
+  font-size: 10px;
+}
+
 #azan-times {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  white-space: nowrap;
 }
 
 .azan-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
+  display: inline;
   font-size: 10px;
 }
 
@@ -343,11 +325,28 @@ body.dark-mode #city-input {
 /* ================================================= */
 
 #dua-name {
+  align-self: center;
   text-align: center;
   font-size: 20px;
-  margin: 6px 0 6px 0;
+  margin: 4px 8px;
   flex-shrink: 0;
-  min-height: 28px;
+
+  background: rgba(245, 240, 225, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(200, 185, 122, 0.5);
+  border-radius: 50px;
+  padding: 4px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+#dua-name:empty {
+  display: none;
+}
+
+body.dark-mode #dua-name {
+  background: rgba(25, 20, 10, 0.88);
+  border-color: rgba(150, 130, 70, 0.4);
 }
 
 
@@ -362,31 +361,47 @@ body.dark-mode #city-input {
   position: relative;
   overflow: hidden;
   background-color: inherit;
-
-  background-image:
-    url('assets/images/c4.gif'),
-    url('assets/images/c1.gif'),
-    url('assets/images/c3.gif'),
-    url('assets/images/c2.gif'),
-    url('assets/images/h2.gif'),
-    url('assets/images/h2.gif'),
-    url('assets/images/ho2.gif'),
-    url('assets/images/ho2.gif');
-
-  background-repeat:
-    no-repeat, no-repeat, no-repeat, no-repeat,
-    repeat-y, repeat-y, repeat-x, repeat-x;
-
-  background-position:
-    top left, top right, bottom left, bottom right,
-    left top, right top, top left, bottom left;
-
-  background-origin: content-box;
-  background-clip: border-box;
 }
 
-body.dark-mode #dua-content {
-  background-image: none;
+#dua-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+
+  --bracket-color: rgba(160, 120, 40, 0.70);
+  --arm: 64px;
+  --th:  4px;
+  --off: 14px;
+
+  background-image:
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* top-left  H */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* top-left  V */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* top-right H */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* top-right V */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* bot-left  H */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* bot-left  V */
+    linear-gradient(var(--bracket-color), var(--bracket-color)),  /* bot-right H */
+    linear-gradient(var(--bracket-color), var(--bracket-color));  /* bot-right V */
+
+  background-size:
+    var(--arm) var(--th),  var(--th) var(--arm),
+    var(--arm) var(--th),  var(--th) var(--arm),
+    var(--arm) var(--th),  var(--th) var(--arm),
+    var(--arm) var(--th),  var(--th) var(--arm);
+
+  background-position:
+    left var(--off) top var(--off),   left var(--off) top var(--off),
+    right var(--off) top var(--off),  right var(--off) top var(--off),
+    left var(--off) bottom var(--off), left var(--off) bottom var(--off),
+    right var(--off) bottom var(--off), right var(--off) bottom var(--off);
+
+  background-repeat: no-repeat;
+}
+
+body.dark-mode #dua-content::after {
+  --bracket-color: rgba(200, 160, 60, 0.50);
 }
 
 
@@ -546,13 +561,27 @@ body.dark-mode #dua-content {
 
 #controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
   flex-shrink: 0;
   flex-wrap: nowrap;
-  margin: 4px auto 6px;
+  margin: 4px 8px 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  gap: 8px;
+}
+
+#controls-right,
+#controls-center,
+#controls-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 12px;
+  flex: 0 0 auto;
 
   background: rgba(245, 240, 225, 0.88);
   backdrop-filter: blur(8px);
@@ -560,13 +589,37 @@ body.dark-mode #dua-content {
   border: 1px solid rgba(200, 185, 122, 0.5);
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: fit-content;
 }
 
-body.dark-mode #controls {
+#controls-left { justify-content: space-between; overflow: hidden; }
+
+#cal-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+#current-time {
+  font-family: SamimV1, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #7a5c00;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+body.dark-mode #current-time {
+  color: #c8a040;
+}
+
+body.dark-mode #controls-right,
+body.dark-mode #controls-center,
+body.dark-mode #controls-left {
   background: rgba(25, 20, 10, 0.88);
   border-color: rgba(150, 130, 70, 0.4);
 }
+
 
 #controls button {
   padding: 2px 6px;
@@ -598,6 +651,18 @@ body.dark-mode #controls button {
 
 #nav-group.hidden {
   display: none;
+}
+
+#farsi-plus-btn.hidden,
+#farsi-minus-btn.hidden,
+#audio-play-btn.hidden {
+  display: none;
+}
+
+#audio-play-btn:not(.hidden) {
+  border-inline-start: 1px solid rgba(200, 185, 122, 0.7);
+  padding-inline-start: 10px;
+  margin-inline-start: 4px;
 }
 
 #slide-counter {
@@ -636,8 +701,9 @@ body.dark-mode .controls-sep {
 
   #dua-list,
   #quran-sidebar {
-    width: 100%;
-    max-height: 30vh;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    padding: 72px 40px;
+    gap: 6px;
   }
 
   .slide {
@@ -669,7 +735,14 @@ body.dark-mode .controls-sep {
   }
 
   #controls {
-    height: 52px;
+    margin: 4px 4px 6px;
     gap: 4px;
+  }
+
+  #controls-right,
+  #controls-center,
+  #controls-left {
+    padding: 4px 6px;
+    gap: 2px;
   }
 }

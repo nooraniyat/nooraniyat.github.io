@@ -24,33 +24,8 @@
 
   <div id="container">
 
-    <!-- Sidebar: Dua list (dua mode) -->
-    <div id="dua-list"></div>
-
-    <!-- Sidebar: Quran surah list (quran mode) -->
-    <div id="quran-sidebar"></div>
-
     <!-- Main screen -->
     <div id="screen">
-
-      <!-- Calendar + Azan compact block (toggleable) -->
-      <div id="calendar-azan-block">
-        <div id="cal-city-block">
-          <span id="city-display" title="کلیک برای تغییر شهر">—</span>
-          <div id="city-edit-row" style="display:none">
-            <input id="city-input" type="text" placeholder="شهر, کشور (مثلاً Tehran, Iran)" />
-            <button id="city-save-btn">ذخیره</button>
-          </div>
-        </div>
-        <div id="cal-dates">
-          <span id="cal-hijri">—</span>
-          <span class="cal-sep">|</span>
-          <span id="cal-persian">—</span>
-          <span class="cal-sep">|</span>
-          <span id="cal-gregorian">—</span>
-        </div>
-        <div id="azan-times"></div>
-      </div>
 
       <!-- View title -->
       <h2 id="dua-name"></h2>
@@ -64,27 +39,59 @@
         <!-- Quran reader (quran mode) -->
         <div id="quran-view"></div>
 
+        <!-- Tile overlays (inside frame, so decorative border stays visible) -->
+        <div id="dua-list"></div>
+        <div id="quran-sidebar"></div>
 
       </div>
 
       <!-- Controls / FAB bar -->
       <div id="controls">
-        <button id="btn-quran" title="قرآن">📖</button>
-        <button id="home-btn" title="فهرست دعا">🤲</button>
 
-        <span id="nav-group">
-          <button id="prev-slide" title="پیشین">▶</button>
-          <input type="range" id="slide-slider" min="1" max="1" value="1" step="1" />
-          <span id="slide-counter">۰ / ۰</span>
-          <button id="next-slide" title="پسین">◀</button>
-        </span>
+        <div id="controls-right">
+          <button id="btn-quran" title="قرآن">📖</button>
+          <button id="home-btn" title="فهرست دعا">🤲</button>
+          <button id="btn-background" title="پس‌زمینه">🖼️</button>
+          <button id="btn-camera" title="دوربین">🎦</button>
+          <button id="contrast-btn" title="روشنایی">🌓</button>
+          <button id="btn-music" title="موسیقی">🎵</button>
+        </div>
 
-        <button id="btn-background" title="پس‌زمینه">🖼️</button>
-        <button id="btn-calendar" title="تقویم و اذان">📅</button>
-        <button id="btn-camera" title="دوربین">🎦</button>
-        <button id="contrast-btn" title="روشنایی">🌓</button>
-        <button id="farsi-minus-btn" title="کوچک‌تر">➖</button>
-        <button id="farsi-plus-btn" title="بزرگ‌تر">➕</button>
+        <div id="controls-center">
+          <span id="nav-group">
+            <button id="prev-slide" title="پیشین">▶</button>
+            <input type="range" id="slide-slider" min="1" max="1" value="1" step="1" />
+            <span id="slide-counter">۰ / ۰</span>
+            <button id="next-slide" title="پسین">◀</button>
+          </span>
+          <button id="farsi-minus-btn" title="کوچک‌تر">➖</button>
+          <button id="farsi-plus-btn" title="بزرگ‌تر">➕</button>
+          <button id="audio-play-btn" title="پخش تلاوت" class="hidden">▷</button>
+        </div>
+
+        <div id="controls-left">
+          <div id="cal-group">
+            <button id="btn-calendar" title="تقویم و اذان">📅</button>
+            <div id="calendar-azan-block">
+              <span id="city-display" title="کلیک برای تغییر شهر">—</span>
+              <div id="city-edit-row" style="display:none">
+                <input id="city-input" type="text" placeholder="شهر, کشور (مثلاً Tehran, Iran)" />
+                <button id="city-save-btn">ذخیره</button>
+              </div>
+              <span class="cal-sep">/</span>
+              <span id="cal-hijri">—</span>
+              <span class="cal-sep">/</span>
+              <span id="cal-persian">—</span>
+              <span class="cal-sep">/</span>
+              <span id="cal-gregorian">—</span>
+              <span class="cal-sep">/</span>
+              <span id="azan-times"></span>
+              <span class="cal-sep">/</span>
+            </div>
+          </div>
+          <span id="current-time">—</span>
+        </div>
+
       </div>
 
     </div>

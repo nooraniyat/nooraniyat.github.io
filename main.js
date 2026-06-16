@@ -32,10 +32,12 @@ const homeBtn         = document.getElementById("home-btn");
 const contrastBtn     = document.getElementById("contrast-btn");
 const farsiPlusBtn    = document.getElementById("farsi-plus-btn");
 const farsiMinusBtn   = document.getElementById("farsi-minus-btn");
+const audioPlayBtn    = document.getElementById("audio-play-btn");
 const btnQuran        = document.getElementById("btn-quran");
 const btnBackground   = document.getElementById("btn-background");
 const btnCalendar     = document.getElementById("btn-calendar");
 const btnCamera       = document.getElementById("btn-camera");
+const btnMusic        = document.getElementById("btn-music");
 const calBlock        = document.getElementById("calendar-azan-block");
 const calHijriEl      = document.getElementById("cal-hijri");
 const calPersianEl    = document.getElementById("cal-persian");
@@ -48,6 +50,8 @@ const citySaveBtn     = document.getElementById("city-save-btn");
 const bgLayerEl       = document.getElementById("background-layer");
 const bgBlurEl        = document.getElementById("bg-blur");
 const bgSharpEl       = document.getElementById("bg-sharp");
+const currentTimeEl   = document.getElementById("current-time");
+const controlsCenterEl = document.getElementById("controls-center");
 
 const CREDIT_SLIDE = { ar: "التماس دعا", fa: null, m: null, isCredit: true };
 
@@ -76,6 +80,12 @@ let currentAudio   = null;
 // Cached Hijri date for background matching
 let cachedHijriMonth = 0;
 let cachedHijriDay   = 0;
+
+// Music player state
+let musicPlaylist  = [];
+let musicLoaded    = false;
+let musicAudio     = null;
+let lastMusicIndex = -1;
 
 
 /* =================================================
@@ -134,14 +144,15 @@ function showView(view) {
       duaSlidesEl.innerHTML = "";
     }
   } else if (view === "quran") {
-    quranSidebarEl.style.display = "block";
+    quranSidebarEl.style.display = "grid";
     quranViewEl.classList.add("active");
     navGroupEl.classList.remove("hidden");
     if (!quranSurahsLoaded) loadQuranSurahs();
+    history.replaceState(null, "", "?list=quran");
   } else if (view === "webcam") {
     webcamViewEl.classList.add("active");
     navGroupEl.classList.add("hidden");
-    duaNameEl.textContent = "سخنرانی";
+    duaNameEl.textContent = "";
     startWebcam();
   } else if (view === "background") {
     navGroupEl.classList.add("hidden");
@@ -149,10 +160,12 @@ function showView(view) {
     loadBackground();
   }
 
-  // Clear URL if leaving dua
-  if (view !== "dua") {
+  // Clear URL if leaving dua or quran
+  if (view !== "dua" && view !== "quran") {
     history.replaceState(null, "", window.location.pathname);
   }
+
+  updateFontSizeBtns();
 }
 
 
@@ -191,11 +204,18 @@ function showSlide(index, updateURL = true, fromSlider = false) {
     params.set("id", index + 1);
     history.replaceState(null, "", "?" + params.toString());
   }
+
+  if (updateURL && currentView === "quran" && currentSurah) {
+    const params = new URLSearchParams();
+    params.set("quran", currentSurah);
+    params.set("id", index + 1);
+    history.replaceState(null, "", "?" + params.toString());
+  }
 }
 
 function updateNavUI() {
   if (slideCounter)
-    slideCounter.textContent = `${currentSlide + 1} / ${currentLines.length}`;
+    slideCounter.textContent = `${toFaDigits(currentSlide + 1)} / ${toFaDigits(currentLines.length)}`;
   if (slideSlider)
     slideSlider.value = currentLines.length - currentSlide;
   if (prevBtn) prevBtn.disabled = currentSlide === 0;
@@ -227,12 +247,15 @@ async function displayDua(folder, slideIndex = 0) {
 
   navGroupEl.classList.remove("hidden");
   homeBtn.classList.add("active-view");
-  showSlide(Math.max(0, slideIndex), false);
+  updateFontSizeBtns();
+  showSlide(Math.max(0, slideIndex), true);
 }
 
 async function loadDuaList() {
   const folders = await fetchJSON(manifestFile);
   if (!folders || !Array.isArray(folders)) return;
+
+  folders.sort((a, b) => (a.name_fa || a.uid).localeCompare(b.name_fa || b.uid, "fa"));
 
   duaListEl.innerHTML = "";
   for (const item of folders) {
@@ -260,6 +283,7 @@ async function loadQuranSurahs() {
   quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری فهرست سور...</div>`;
   duaNameEl.textContent = "";
   navGroupEl.classList.add("hidden");
+  updateFontSizeBtns();
 
   const data = await fetchJSON(`${QURAN_API}/chapters?language=fa`);
   if (!data || !data.chapters) {
@@ -275,26 +299,24 @@ async function loadQuranSurahs() {
     const btn = document.createElement("button");
     const nameFa = s.translated_name?.name || "";
     btn.innerHTML = `
-      <span class="surah-right">
-        <span class="surah-num">${toFaDigits(s.id)}</span>
-        <span class="surah-arabic">${s.name_arabic}</span>
-      </span>
+      <span class="surah-num">${toFaDigits(s.id)}</span>
+      <span class="surah-arabic">${s.name_arabic}</span>
       <span class="surah-trans">${nameFa}</span>
     `;
     btn.onclick = () => loadQuranSurah(s.id);
     quranSidebarEl.appendChild(btn);
   }
 
-  quranViewEl.innerHTML = `<div class="quran-loading">یک سوره را از فهرست انتخاب کنید</div>`;
+  quranViewEl.innerHTML = "";
 }
 
-async function loadQuranSurah(surahNum) {
+async function loadQuranSurah(surahNum, updateURL = true) {
   currentSurah = surahNum;
   stopAudio();
   quranSidebarEl.style.display = "none";
 
   const surah = quranSurahs.find(s => s.id === surahNum);
-  duaNameEl.textContent = surah ? surah.name_arabic : "";
+  duaNameEl.textContent = surah ? `${toFaDigits(surah.id)}. ${surah.name_arabic}` : "";
 
   quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری...</div>`;
 
@@ -324,7 +346,8 @@ async function loadQuranSurah(surahNum) {
   }
 
   navGroupEl.classList.remove("hidden");
-  showQuranVerse(0);
+  updateFontSizeBtns();
+  showSlide(0, updateURL);
   updateNavUI();
 }
 
@@ -341,15 +364,12 @@ function showQuranVerse(index) {
     <div class="slide">
       ${showBismillah ? `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>` : ""}
       <div class="arabic-line">${v.ar}</div>
-      <div class="verse-info">
-        <span class="verse-key">${v.key}</span>
-        <button class="audio-btn" id="audio-play-btn" title="پخش تلاوت">▷</button>
-      </div>
       <div class="farsi-line">${v.fa}</div>
     </div>
   `;
 
-  document.getElementById("audio-play-btn").onclick = () => toggleVerseAudio(v.surah, v.ayah);
+  stopAudio();
+  audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
 }
 
 function getAudioUrl(surah, ayah) {
@@ -359,17 +379,16 @@ function getAudioUrl(surah, ayah) {
 }
 
 function toggleVerseAudio(surah, ayah) {
-  const btn = document.getElementById("audio-play-btn");
   if (currentAudio && !currentAudio.paused) {
     currentAudio.pause();
-    if (btn) btn.textContent = "▷";
+    audioPlayBtn.textContent = "▷";
     return;
   }
   stopAudio();
   currentAudio = new Audio(getAudioUrl(surah, ayah));
   currentAudio.play();
-  if (btn) btn.textContent = "⏸";
-  currentAudio.onended = () => { if (btn) btn.textContent = "▷"; };
+  audioPlayBtn.textContent = "⏸";
+  currentAudio.onended = () => { audioPlayBtn.textContent = "▷"; };
 }
 
 function stopAudio() {
@@ -377,6 +396,7 @@ function stopAudio() {
     currentAudio.pause();
     currentAudio = null;
   }
+  audioPlayBtn.textContent = "▷";
 }
 
 
@@ -475,11 +495,24 @@ async function loadCalendarAzan() {
     const azanData = await azanRes.json();
     const timings = azanData?.data?.timings;
     if (timings) {
-      azanTimesEl.innerHTML = Object.entries(AZAN_KEYS).map(([key, label]) =>
-        timings[key]
-          ? `<span class="azan-item"><span class="azan-label">${label}</span> ${toFaDigits(timings[key])}</span>`
-          : ""
-      ).join("");
+      const now = new Date();
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+
+      const allAzan = Object.entries(AZAN_KEYS)
+        .filter(([key]) => timings[key])
+        .map(([key, label]) => {
+          const timeStr = timings[key].replace(/\s*\(.*\)/, '').trim();
+          const [h, m] = timeStr.split(':').map(Number);
+          return { label, timeStr, mins: h * 60 + m };
+        });
+
+      const upcoming = allAzan.filter(a => a.mins > nowMins);
+      const next2 = upcoming.slice(0, 2);
+      if (next2.length < 2) next2.push(...allAzan.slice(0, 2 - next2.length));
+
+      azanTimesEl.innerHTML = next2
+        .map(a => `<span class="azan-item">${a.label} ${toFaDigits(a.timeStr)}</span>`)
+        .join('<span class="cal-sep"> / </span>');
     }
   } catch { azanTimesEl.textContent = "—"; }
 
@@ -557,6 +590,27 @@ function toggleBackground() {
    DARK MODE + FONT SIZE
 ================================================= */
 
+function updateFontSizeBtns() {
+  const duaListOpen    = duaListEl.style.display !== "none";
+  const quranListOpen  = quranSidebarEl.style.display !== "none";
+
+  const show = (currentView === "dua"   && currentLines.length > 0  && !duaListOpen) ||
+               (currentView === "quran" && quranVerses.length > 0   && !quranListOpen);
+  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen;
+
+  farsiPlusBtn.classList.toggle("hidden", !show);
+  farsiMinusBtn.classList.toggle("hidden", !show);
+  audioPlayBtn.classList.toggle("hidden", !isQuranContent);
+  controlsCenterEl.style.display = show ? "" : "none";
+}
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+  currentTimeEl.textContent = toFaDigits(`${h}:${m}`);
+}
+
 function toggleContrast() {
   isDarkMode = !isDarkMode;
   document.body.classList.toggle("dark-mode", isDarkMode);
@@ -581,9 +635,45 @@ function setFarsiFontSize(size) {
    KEYBOARD CONTROLS
 ================================================= */
 
+function dismissOverlays() {
+  duaListEl.style.display = "none";
+  quranSidebarEl.style.display = "none";
+  // Restore content URL or clear
+  if (currentView === "dua" && currentFolder) {
+    // showSlide already set the dua URL — leave it
+  } else if (currentView === "quran" && currentSurah) {
+    // showSlide already set the quran URL — leave it
+  } else {
+    history.replaceState(null, "", window.location.pathname);
+  }
+  updateFontSizeBtns();
+}
+
+duaListEl.addEventListener("click", (e) => {
+  if (e.target === duaListEl) {
+    dismissOverlays();
+    if (currentLines.length === 0) goHome();
+  }
+});
+
+quranSidebarEl.addEventListener("click", (e) => {
+  if (e.target === quranSidebarEl) {
+    dismissOverlays();
+    if (quranVerses.length === 0) goHome();
+  }
+});
+
 document.addEventListener("keydown", (e) => {
   if (e.target === cityInputEl) return;
 
+  if (e.key === "Escape") {
+    if (duaListEl.style.display !== "none" || quranSidebarEl.style.display !== "none") {
+      dismissOverlays();
+    } else {
+      goHome();
+    }
+    return;
+  }
   if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " || e.key === "Enter") {
     if (currentLines.length) showSlide(currentSlide + 1);
   }
@@ -595,6 +685,54 @@ document.addEventListener("keydown", (e) => {
 
 
 /* =================================================
+   MUSIC PLAYER
+================================================= */
+
+async function loadMusicPlaylist() {
+  if (musicLoaded) return;
+  const data = await fetchJSON("media/music/playlist.json");
+  if (data && Array.isArray(data)) musicPlaylist = data.filter(Boolean);
+  musicLoaded = true;
+}
+
+function pickMusicIndex() {
+  if (musicPlaylist.length === 1) return 0;
+  let idx;
+  do { idx = Math.floor(Math.random() * musicPlaylist.length); }
+  while (idx === lastMusicIndex);
+  return idx;
+}
+
+function playNextTrack() {
+  if (!musicPlaylist.length) return;
+  lastMusicIndex = pickMusicIndex();
+  const src = `media/music/${musicPlaylist[lastMusicIndex]}`;
+  if (musicAudio) { musicAudio.onended = null; musicAudio.pause(); }
+  musicAudio = new Audio(src);
+  musicAudio.volume = 0.35;
+  musicAudio.play().catch(() => {});
+  musicAudio.onended = playNextTrack;
+}
+
+async function toggleMusic() {
+  await loadMusicPlaylist();
+  if (!musicPlaylist.length) return;
+
+  if (musicAudio && !musicAudio.paused) {
+    musicAudio.pause();
+    btnMusic.classList.remove("active-view");
+  } else {
+    if (musicAudio && musicAudio.src) {
+      musicAudio.play().catch(() => {});
+    } else {
+      playNextTrack();
+    }
+    btnMusic.classList.add("active-view");
+  }
+}
+
+
+/* =================================================
    WIRE CONTROLS
 ================================================= */
 
@@ -603,12 +741,25 @@ nextBtn.onclick   = () => showSlide(currentSlide + 1);
 homeBtn.onclick = () => {
   if (currentView !== "dua") {
     showView("dua");
-    duaListEl.style.display = "block";
+    duaListEl.style.display = "grid";
+    history.replaceState(null, "", "?list=dua");
   } else {
-    duaListEl.style.display = duaListEl.style.display === "none" ? "block" : "none";
+    duaListEl.style.display = duaListEl.style.display === "none" ? "grid" : "none";
+    if (duaListEl.style.display !== "none") history.replaceState(null, "", "?list=dua");
+    else dismissOverlays();
+  }
+  updateFontSizeBtns();
+};
+btnQuran.onclick = () => {
+  if (currentView !== "quran") {
+    showView("quran"); // sets ?list=quran internally
+  } else {
+    quranSidebarEl.style.display = quranSidebarEl.style.display === "none" ? "grid" : "none";
+    if (quranSidebarEl.style.display !== "none") history.replaceState(null, "", "?list=quran");
+    else dismissOverlays();
+    updateFontSizeBtns();
   }
 };
-btnQuran.onclick  = () => showView("quran");
 btnCamera.onclick = () => {
   if (currentView === "webcam") showView("dua");
   else showView("webcam");
@@ -616,6 +767,7 @@ btnCamera.onclick = () => {
 
 btnBackground.onclick = toggleBackground;
 btnCalendar.onclick   = toggleCalendar;
+btnMusic.onclick      = toggleMusic;
 contrastBtn.onclick   = toggleContrast;
 farsiPlusBtn.onclick  = () => setFarsiFontSize(getFarsiFontSize() + 2);
 farsiMinusBtn.onclick = () => setFarsiFontSize(getFarsiFontSize() - 2);
@@ -654,11 +806,16 @@ cityInputEl.addEventListener("keydown", e => {
 ================================================= */
 
 async function init() {
+  updateClock();
+  setInterval(updateClock, 60000);
+
   await loadDuaList();
 
-  const params   = new URLSearchParams(window.location.search);
-  const nameParam = params.get("name");
-  const idParam   = parseInt(params.get("id"), 10) || 1;
+  const params     = new URLSearchParams(window.location.search);
+  const nameParam  = params.get("name");
+  const quranParam = parseInt(params.get("quran"), 10);
+  const idParam    = parseInt(params.get("id"), 10) || 1;
+  const listParam  = params.get("list");
 
   if (nameParam) {
     const folders   = await fetchJSON(manifestFile) || [];
@@ -667,6 +824,36 @@ async function init() {
       await displayDua(nameParam, idParam - 1);
       return;
     }
+  }
+
+  if (quranParam) {
+    currentView = "quran";
+    previousView = "dua";
+    duaSlidesEl.classList.remove("active");
+    quranViewEl.classList.add("active");
+    duaListEl.style.display = "none";
+    quranSidebarEl.style.display = "none";
+    btnQuran.classList.add("active-view");
+    bgLayerEl.style.opacity = "0.45";
+    updateFontSizeBtns();
+    await loadQuranSurahs();
+    await loadQuranSurah(quranParam, false);
+    showSlide(idParam - 1, true);
+    return;
+  }
+
+  if (listParam === "dua") {
+    showView("dua");
+    duaListEl.style.display = "grid";
+    updateFontSizeBtns();
+    return;
+  }
+
+  if (listParam === "quran") {
+    await loadQuranSurahs();
+    showView("quran");
+    updateFontSizeBtns();
+    return;
   }
 
   showView("dua");
