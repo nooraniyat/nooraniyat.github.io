@@ -38,6 +38,7 @@ const btnBackground   = document.getElementById("btn-background");
 const btnCalendar     = document.getElementById("btn-calendar");
 const btnCamera       = document.getElementById("btn-camera");
 const btnMusic        = document.getElementById("btn-music");
+const btnFullscreen   = document.getElementById("btn-fullscreen");
 const calBlock        = document.getElementById("calendar-azan-block");
 const calHijriEl      = document.getElementById("cal-hijri");
 const calPersianEl    = document.getElementById("cal-persian");
@@ -54,7 +55,7 @@ const currentTimeEl   = document.getElementById("current-time");
 const controlsCenterEl = document.getElementById("controls-center");
 
 const CREDIT_SLIDE       = { ar: "التماس دعا",           fa: null, m: null, isCredit: true };
-const QURAN_CREDIT_SLIDE = { ar: "صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم", fa: null, m: null, isCredit: true };
+const QURAN_CREDIT_SLIDE = { ar: "صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم", fa: "راست گفت خدای بلندمرتبه و با عظمت", m: null, isCredit: true };
 
 
 /* =================================================
@@ -70,6 +71,7 @@ let isDarkMode     = false;
 let persianFontSize  = null;
 let webcamStream   = null;
 let calendarVisible = false;
+let cachedAzan     = [];   // prayer times for today, set once after API fetch
 
 // Quran state
 let quranSurahsLoaded = false;
@@ -175,6 +177,7 @@ function showView(view) {
 /* =================================================
    DUA SLIDE LOGIC
 ================================================= */
+
 
 function createSlideHTML(line) {
   return `
@@ -332,7 +335,7 @@ async function loadQuranSurah(surahNum, updateURL = true) {
     return;
   }
 
-  quranVerses = data.verses.map(v => ({
+  const verses = data.verses.map(v => ({
     key: v.verse_key,
     ar: v.text_uthmani || "",
     fa: (v.translations?.[0]?.text || "").replace(/<[^>]+>/g, ""),
@@ -340,7 +343,10 @@ async function loadQuranSurah(surahNum, updateURL = true) {
     ayah: v.verse_number
   }));
 
-  quranVerses  = [...quranVerses, QURAN_CREDIT_SLIDE];
+  const needsBismillah = surahNum !== 1 && surahNum !== 9;
+  quranVerses = needsBismillah
+    ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: null, isBismillah: true, surah: surahNum, ayah: 0 }, ...verses, QURAN_CREDIT_SLIDE]
+    : [...verses, QURAN_CREDIT_SLIDE];
   currentLines = quranVerses;
   currentSlide = 0;
 
@@ -368,19 +374,24 @@ function showQuranVerse(index) {
   }
 
   const v = quranVerses[index];
-
-  const showBismillah = index === 0 && v.surah !== 1 && v.surah !== 9;
-
-  quranViewEl.innerHTML = `
-    <div class="slide">
-      ${showBismillah ? `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>` : ""}
-      <div class="arabic-line">${v.ar}</div>
-      <div class="persian-line">${v.fa}</div>
-    </div>
-  `;
-
   const wasAutoPlaying = isAutoPlaying;
   stopAudio();
+
+  if (v.isBismillah) {
+    quranViewEl.innerHTML = `
+      <div class="slide">
+        <div class="arabic-line">${v.ar}</div>
+      </div>
+    `;
+  } else {
+    quranViewEl.innerHTML = `
+      <div class="slide">
+        <div class="arabic-line">${v.ar}</div>
+        <div class="persian-line">${v.fa}</div>
+      </div>
+    `;
+  }
+
   audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
 
   if (wasAutoPlaying) {
@@ -437,7 +448,7 @@ async function startWebcam() {
     webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     webcamFeedEl.srcObject = webcamStream;
   } catch (e) {
-    webcamViewEl.innerHTML = `<div style="color:#fff;padding:40px;text-align:center;font-family:SamimV1">دسترسی به دوربین ممکن نبود</div>`;
+    webcamViewEl.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55)"><span style="color:#fff;font-family:SamimV1;font-size:22px">دسترسی به دوربین ممکن نبود</span></div>`;
     console.error("Webcam:", e);
   }
 }
@@ -523,24 +534,14 @@ async function loadCalendarAzan() {
     const azanData = await azanRes.json();
     const timings = azanData?.data?.timings;
     if (timings) {
-      const now = new Date();
-      const nowMins = now.getHours() * 60 + now.getMinutes();
-
-      const allAzan = Object.entries(AZAN_KEYS)
+      cachedAzan = Object.entries(AZAN_KEYS)
         .filter(([key]) => timings[key])
         .map(([key, label]) => {
           const timeStr = timings[key].replace(/\s*\(.*\)/, '').trim();
           const [h, m] = timeStr.split(':').map(Number);
           return { label, timeStr, mins: h * 60 + m };
         });
-
-      const upcoming = allAzan.filter(a => a.mins > nowMins);
-      const next2 = upcoming.slice(0, 2);
-      if (next2.length < 2) next2.push(...allAzan.slice(0, 2 - next2.length));
-
-      azanTimesEl.innerHTML = next2
-        .map(a => `<span class="azan-item">${a.label} ${toFaDigits(a.timeStr)}</span>`)
-        .join('<span class="cal-sep"> / </span>');
+      renderAzan();
     }
   } catch { azanTimesEl.textContent = "—"; }
 
@@ -632,11 +633,20 @@ function updateFontSizeBtns() {
   controlsCenterEl.style.display = show ? "" : "none";
 }
 
+function renderAzan() {
+  if (!cachedAzan.length) return;
+  const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
+  const upcoming = cachedAzan.filter(a => a.mins > nowMins);
+  const next1 = upcoming.length ? upcoming[0] : cachedAzan[0];
+  azanTimesEl.innerHTML = `<span class="azan-item">${next1.label} ${toFaDigits(next1.timeStr)}</span>`;
+}
+
 function updateClock() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, "0");
   const m = String(now.getMinutes()).padStart(2, "0");
   currentTimeEl.textContent = toFaDigits(`${h}:${m}`);
+  renderAzan();
 }
 
 function toggleContrast() {
@@ -808,6 +818,17 @@ btnBackground.onclick = toggleBackground;
 btnCalendar.onclick   = toggleCalendar;
 btnMusic.onclick      = toggleMusic;
 contrastBtn.onclick   = toggleContrast;
+
+btnFullscreen.onclick = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+};
+document.addEventListener("fullscreenchange", () => {
+  btnFullscreen.textContent = document.fullscreenElement ? "⊡" : "⛶";
+});
 persianPlusBtn.onclick  = () => setPersianFontSize(getPersianFontSize() + 2);
 persianMinusBtn.onclick = () => setPersianFontSize(getPersianFontSize() - 2);
 

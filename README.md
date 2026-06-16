@@ -26,19 +26,24 @@ The app supports four display modes, switchable from the floating control bar:
 - Verse-by-verse navigation with slider and Persian digit counter
 - Persian translation by Fooladvand (ID 29 via api.quran.com)
 - Audio recitation via everyayah.com (Abdul Basit Murattal)
-- Bismillah displayed automatically on the first verse of applicable chapters
+- **Auto-advance playback** — after each verse ends, the next verse loads and plays automatically after a 1-second pause; pressing pause stops auto-advance
+- Audio stops automatically when switching views or opening the surah list
+- **Bismillah on its own slide** — بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ appears as a dedicated first slide with its own audio recitation (`{surah}000.mp3`) for all surahs except Al-Fatiha (1) and At-Tawbah (9)
+- Closing slide: **صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم** with Persian translation appended after the last verse
 - Amiri Quran font for complete Arabic glyph coverage
 - Deep-link URL: `?quran=<surah>&id=<verse>`
 
 ### Dua Slideshow
 - JSON-driven dua files loaded from `db/`
-- Arabic text + Persian translation per slide
+- Arabic text + Persian translation per slide, with a gold fading divider line between them
 - Alphabetically sorted dua list (by Persian name)
 - Slide counter and progress slider (Persian digits)
+- Closing credit slide (التماس دعا) appended automatically
 - Deep-link URL: `?name=<uid>&id=<slide>`
 
 ### List Overlays
 - Dua list and Quran surah list open as fullscreen tile overlays inside the content frame
+- Consistent tile height (70 px) for a uniform grid
 - Dismiss by clicking outside tiles, pressing Escape, or clicking the FAB icon again
 - Deep-link URL: `?list=dua` and `?list=quran`
 - Decorative corner L-brackets remain visible above overlays
@@ -49,12 +54,12 @@ The app supports four display modes, switchable from the floating control bar:
 - **Hijri date** — fetched from api.aladhan.com with Persian digits
 - **Persian (Jalali) date** — computed via jalaali-js with Persian digits
 - **Gregorian date** — day · month name · year in Western digits
-- **Next 2 prayer times** — Fajr, Sunrise, Dhuhr, Sunset, Maghrib filtered to upcoming times; wraps to start of day when all have passed
+- **Next upcoming prayer time** — Fajr, Sunrise, Dhuhr, Sunset, Maghrib filtered to the next single upcoming time; wraps to start of day when all have passed; display updates automatically every minute from cached data (no extra API calls)
 - Calculation method: Institute of Geophysics, University of Tehran (method 7)
 - Default city: Waterloo, Ontario, Canada
 
 ### Background System
-- Hijri event manifest at `media/backgrounds.json`
+- Hijri event manifest at `media/background/backgrounds.json`
 - Automatically selects the matching background image for today's Islamic date
 - Supports `start_hour` / `end_hour` for time-of-day transitions (e.g. Muharram eve from noon of 29 Dhul-Hijja)
 - Falls back to next upcoming event if today has no match
@@ -68,12 +73,23 @@ The app supports four display modes, switchable from the floating control bar:
 ### General
 - **Live clock** — updates every minute, shown in the left FAB pill (Persian digits)
 - **Dark mode** toggle (🌓)
+- **Fullscreen** toggle (⛶) — enters/exits browser fullscreen; icon changes to ⊡ when active
 - **Adjustable Persian font size** (➖ / ➕), range 10px – 60px, visible only when content is active
 - **Keyboard navigation** — ← → Page Up/Down Space Enter
-- **Decorative CSS L-bracket corners** around the content frame (CSS-gradient-based, no images)
-- **Pill-style title bar** — title of current dua or surah shown in a pill matching the FAB style
+- **Decorative CSS L-bracket corners** around the content frame — gold color, black glow, CSS-gradient-based (no images)
+- **Pill-style title bar** — title of current dua or surah shown in a pill with decorative fading side lines
+- **Responsive FAB bar** — on narrow screens the three pill blocks stack vertically (center → calendar → icons) via CSS container queries
+- **Single-point background color** — change `--base-bg` in `:root` to retheme the entire app
 - RTL layout throughout
 - No frameworks, no build tools
+
+### SEO & PWA
+- Full Open Graph and Twitter Card meta tags for social sharing
+- Canonical URL, keywords, and author meta
+- `robots.txt` allowing full indexing with sitemap pointer
+- `sitemap.xml` with weekly change frequency
+- `site.webmanifest` for PWA installability (`display: standalone`, theme color `#c8b97a`)
+- SVG favicon — gold "ن" on a cream circle
 
 ---
 
@@ -104,6 +120,10 @@ nooraniyat/
 ├── index.html              # Single-page app shell, all DOM structure
 ├── style.css               # All styles — layout, themes, animations
 ├── main.js                 # All logic — state, views, API calls, events
+├── favicon.svg             # Gold "ن" SVG icon
+├── robots.txt              # Search engine crawl rules
+├── sitemap.xml             # Single-URL sitemap for nooraniyat.github.io
+├── site.webmanifest        # PWA manifest
 │
 ├── assets/
 │   ├── fonts/
@@ -111,18 +131,19 @@ nooraniyat/
 │   │   ├── Samim-v0.10.3-Bold.woff / .ttf     # Body text (bold)
 │   │   ├── NotoNaskhArabic-Regular.ttf         # Arabic prose (duas)
 │   │   └── QuranTaha.ttf                       # Quranic Arabic
-│   └── images/             # Decorative PNG assets (unused in active layout)
+│   └── images/             # Decorative PNG assets
 │
 ├── db/
 │   ├── manifest.json       # Index of all available dua/ziyarat files
 │   └── *.json              # Individual dua files (Arabic + Persian content)
 │
 └── media/
-    ├── backgrounds.json    # Hijri calendar → background image mapping
-    ├── *.jpg               # Event background images
+    ├── background/
+    │   ├── backgrounds.json    # Hijri calendar → background image mapping
+    │   └── *.jpg               # Event background images
     └── music/
-        ├── playlist.json   # Ordered list of music filenames
-        └── *.mp3           # Background music tracks
+        ├── playlist.json       # Ordered list of music filenames
+        └── *.mp3               # Background music tracks
 ```
 
 ### DOM Structure
@@ -132,7 +153,7 @@ nooraniyat/
   #background-layer          ← fixed, z-index 0; blurred + sharp layers
   #webcam-view               ← fixed, z-index 0; video feed
   #container                 ← z-index 1; centers the screen
-    #screen                  ← flex column
+    #screen                  ← flex column (container-type: inline-size)
       #dua-name (h2)         ← pill-style title bar (hidden when empty)
       #dua-content           ← flex:1 content frame (positioning parent)
         #dua-slides-container  ← dua slide stack
@@ -140,8 +161,8 @@ nooraniyat/
         #dua-list              ← absolute overlay, z-index 10; dua tile grid
         #quran-sidebar         ← absolute overlay, z-index 10; surah tile grid
         ::after                ← absolute overlay, z-index 20; CSS L-brackets
-      #controls              ← 3-pill FAB bar
-        #controls-right      ← [📖][🤲][🖼️][🎦][🌓][🎵]
+      #controls              ← 3-pill FAB bar (stacks on narrow screens)
+        #controls-right      ← [📖][🤲][🖼️][🎦][🌓][🎵][⛶]
         #controls-center     ← [◀][slider][۳/۱۲][▶][➖][➕][▷]
         #controls-left       ← [📅][city/dates/azan] … [time]
 ```
@@ -158,7 +179,7 @@ All mutable state lives as module-level `let` variables in `main.js`:
 | `currentSlide` | number | Zero-based index of the displayed slide |
 | `currentFolder` | string | UID of the currently loaded dua |
 | `currentSurah` | number | Currently selected Quran surah number |
-| `quranVerses` | array | Verses of the currently loaded surah |
+| `quranVerses` | array | Verses of the currently loaded surah (+ credit slide) |
 | `quranSurahs` | array | Full surah list (cached after first load) |
 | `quranSurahsLoaded` | bool | Guard against re-fetching surah list |
 | `isDarkMode` | bool | Dark mode toggle state |
@@ -169,6 +190,9 @@ All mutable state lives as module-level `let` variables in `main.js`:
 | `musicPlaylist` | array | Filenames from `playlist.json` |
 | `musicAudio` | Audio | Active music Audio element |
 | `lastMusicIndex` | number | Previous track index (prevents consecutive repeat) |
+| `currentAudio` | Audio | Active Quran verse Audio element |
+| `isAutoPlaying` | bool | Whether Quran auto-advance is active |
+| `autoPlayTimer` | number | setTimeout handle for inter-verse delay |
 
 ### View System
 
@@ -176,11 +200,12 @@ All mutable state lives as module-level `let` variables in `main.js`:
 1. Removes `.active` from all view containers
 2. Hides both list overlays
 3. Stops webcam unless entering webcam mode
-4. Records `previousView` (for background toggle-back)
-5. Sets active-view CSS on FAB buttons
-6. Controls `background-layer` opacity (0.45 normal, 0.95 in background mode)
-7. Runs view-specific setup (show sidebar, activate quran, start webcam, etc.)
-8. Clears URL if leaving dua/quran view
+4. Stops Quran audio when leaving Quran view
+5. Records `previousView` (for background toggle-back)
+6. Sets active-view CSS on FAB buttons
+7. Controls `background-layer` opacity (0.45 normal, 0.95 in background mode)
+8. Runs view-specific setup (show sidebar, activate quran, start webcam, etc.)
+9. Clears URL if leaving dua/quran view
 
 ### URL Routing
 
@@ -200,6 +225,8 @@ On page load, `init()` reads `URLSearchParams` and restores the matching state.
 
 All three blocks share the same pill style: `rgba(245,240,225,0.88)` background, `backdrop-filter: blur(8px)`, gold border, `border-radius: 50px`.
 
+On screens narrower than 620 px (container query on `#screen`), the three blocks stack vertically: center navigation first, then calendar, then view controls.
+
 **Right block** (`#controls-right`) — view & mode controls:
 - 📖 Quran — opens quran list / toggles sidebar
 - 🤲 Dua — opens dua list / toggles list
@@ -207,17 +234,25 @@ All three blocks share the same pill style: `rgba(245,240,225,0.88)` background,
 - 🎦 Webcam — toggles camera view
 - 🌓 Contrast — toggles dark mode
 - 🎵 Music — toggles shuffle playback
+- ⛶ Fullscreen — toggles browser fullscreen (icon becomes ⊡ when active)
 
 **Center block** (`#controls-center`) — content navigation (hidden when no content active or list is open):
 - ▶ / ◀ Prev/Next slide
 - Range slider — scrub to any slide (RTL, mirrored)
 - Slide counter — `currentSlide/total` in Persian digits
 - ➖ / ➕ Persian font size
-- ▷ Audio play (Quran mode only, separated by a gold divider)
+- ▷ Audio play/pause (Quran mode only, separated by a gold divider); switches to ⏸ during playback
 
 **Left block** (`#controls-left`) — calendar, azan, clock:
-- 📅 toggles `#calendar-azan-block` (city · Hijri · Jalali · Gregorian · next 2 azans)
+- 📅 toggles `#calendar-azan-block` (city · Hijri · Jalali · Gregorian · next azan)
 - Live time display (Persian digits, updated every 60s)
+
+### Quran Audio System
+
+- `playVerseAudio(surah, ayah)` — fetches MP3 from everyayah.com and plays it; on `ended`, if `isAutoPlaying` is true, waits 1 second then advances to the next verse
+- `stopAudio()` — cancels the auto-advance timer, clears `isAutoPlaying`, pauses and discards the Audio element, resets the play button
+- `toggleVerseAudio()` — if not playing, sets `isAutoPlaying = true` and starts; if playing, calls `stopAudio()`
+- Auto-advance stops at the credit slide (صَدَقَ اللَّهُ) and does not loop
 
 ### Data Layer
 
@@ -227,7 +262,7 @@ All three blocks share the same pill style: `rgba(245,240,225,0.88)` background,
 |---|---|---|
 | `db/manifest.json` | `[{uid, name_fa, name_ar}]` | `loadDuaList()` builds dua tile grid |
 | `db/<uid>.json` | `{uid, name_fa, content:[{ar,fa,m}]}` | `displayDua()` builds slide stack |
-| `media/backgrounds.json` | `[{hijri_month, hijri_day, start_hour?, end_hour?, event_fa, image}]` | `loadBackground()` selects event image |
+| `media/background/backgrounds.json` | `[{hijri_month, hijri_day, start_hour?, end_hour?, event_fa, image}]` | `loadBackground()` selects event image |
 | `media/music/playlist.json` | `["file.mp3", ...]` | `toggleMusic()` loads shuffle playlist |
 
 **External APIs**
@@ -254,6 +289,14 @@ Four typefaces, all loaded locally except Amiri Quran:
 | `QuranTaha` | `QuranTaha.ttf` | Quranic Arabic fallback |
 | `Amiri Quran` | Google Fonts CDN | Primary Quranic Arabic (full glyph set) |
 
+### CSS Custom Properties
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `--base-bg` | `#fdf8f0` | Page background color (light mode) — change once to retheme everywhere |
+| `--base-bg-dark` | `#1a1a1a` | Page background color (dark mode) |
+| `--persian-font-size` | `20px` | Persian translation font size (adjusted by ➖/➕) |
+
 ### Persistence (`localStorage`)
 
 | Key | Value | Set by |
@@ -270,13 +313,14 @@ The four gold L-bracket corners around `#dua-content` are pure CSS — no images
 #dua-content::after {
   position: absolute; inset: 0; z-index: 20; pointer-events: none;
   background-image: 8× linear-gradient(gold, gold);  /* 2 strips per corner */
-  background-size: 64px×4px (H arm), 4px×64px (V arm);
+  background-size: 64px×8px (H arm), 8px×64px (V arm);
   background-position: corner offsets (14px from each edge);
+  filter: drop-shadow(0 0 6px black);
   background-repeat: no-repeat;
 }
 ```
 
-The `::after` sits above the list overlays (z-index 20 vs 10) so brackets are always visible, and `pointer-events: none` lets clicks pass through.
+`#dua-content` uses `overflow: visible` so the drop-shadow is not clipped. The `::after` sits above the list overlays (z-index 20 vs 10) so brackets are always visible, and `pointer-events: none` lets clicks pass through.
 
 ---
 
@@ -302,18 +346,18 @@ Individual dua file (e.g. `db/dua-kumayl.json`):
 }
 ```
 
-Fields `ar`, `fa`, and `m` are all optional per slide. A trailing credit slide (`التماس دعا`) is appended automatically.
+Fields `ar`, `fa`, and `m` are all optional per slide. A trailing credit slide (التماس دعا) is appended automatically.
 
 ---
 
 ## Background Manifest Format
 
-`media/backgrounds.json`:
+`media/background/backgrounds.json`:
 
 ```json
 [
-  { "hijri_month": 1,  "hijri_day": 10, "event_fa": "عاشورا", "image": "media/ashura.jpg" },
-  { "hijri_month": 12, "hijri_day": 29, "start_hour": 12, "event_fa": "آستانه محرم", "image": "media/muharram.jpg" }
+  { "hijri_month": 1,  "hijri_day": 10, "event_fa": "عاشورا", "image": "media/background/ashura.jpg" },
+  { "hijri_month": 12, "hijri_day": 29, "start_hour": 12, "event_fa": "آستانه محرم", "image": "media/background/muharram1.jpg" }
 ]
 ```
 
@@ -351,8 +395,8 @@ Or use the **Live Server** extension in VS Code.
 ## Tech Stack
 
 - HTML5 (single page, no templating)
-- CSS3 — Flexbox, CSS Grid, `backdrop-filter`, CSS custom properties, multi-layer `background-image` gradients
-- Vanilla JavaScript — ES6+, `async/await`, `fetch`, `URLSearchParams`, `history.replaceState`, Web Audio, MediaDevices API
+- CSS3 — Flexbox, CSS Grid, `backdrop-filter`, CSS custom properties, container queries, multi-layer `background-image` gradients
+- Vanilla JavaScript — ES6+, `async/await`, `fetch`, `URLSearchParams`, `history.replaceState`, Web Audio, MediaDevices API, Fullscreen API
 - JSON data files (local dua content + event calendar)
 - No build tools. No frameworks. No dependencies.
 
