@@ -5,7 +5,7 @@
 const dbFolder = "db";
 const manifestFile = `${dbFolder}/manifest.json`;
 const QURAN_API = "https://api.quran.com/api/v4";
-const FARSI_TRANSLATION_ID = 29; // Fooladvand (Persian/Farsi)
+const PERSIAN_TRANSLATION_ID = 29; // Fooladvand (Persian)
 const ALADHAN_API = "https://api.aladhan.com/v1";
 const AUDIO_BASE = "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/";
 
@@ -30,8 +30,8 @@ const slideSlider     = document.getElementById("slide-slider");
 const navGroupEl      = document.getElementById("nav-group");
 const homeBtn         = document.getElementById("home-btn");
 const contrastBtn     = document.getElementById("contrast-btn");
-const farsiPlusBtn    = document.getElementById("farsi-plus-btn");
-const farsiMinusBtn   = document.getElementById("farsi-minus-btn");
+const persianPlusBtn    = document.getElementById("persian-plus-btn");
+const persianMinusBtn   = document.getElementById("persian-minus-btn");
 const audioPlayBtn    = document.getElementById("audio-play-btn");
 const btnQuran        = document.getElementById("btn-quran");
 const btnBackground   = document.getElementById("btn-background");
@@ -66,7 +66,7 @@ let currentLines   = [];
 let currentSlide   = 0;
 let currentFolder  = "";
 let isDarkMode     = false;
-let farsiFontSize  = null;
+let persianFontSize  = null;
 let webcamStream   = null;
 let calendarVisible = false;
 
@@ -177,7 +177,7 @@ function createSlideHTML(line) {
     <div class="slide">
       ${line.m ? `<div class="meta-line">${line.m}</div>` : ""}
       ${line.ar ? `<div class="arabic-line">${line.ar.replace(/\n/g, "<br>")}</div>` : ""}
-      ${line.fa ? `<div class="farsi-line">${line.fa.replace(/\n/g, "<br>")}</div>` : ""}
+      ${line.fa ? `<div class="persian-line">${line.fa.replace(/\n/g, "<br>")}</div>` : ""}
     </div>
   `;
 }
@@ -320,7 +320,7 @@ async function loadQuranSurah(surahNum, updateURL = true) {
 
   quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری...</div>`;
 
-  const url = `${QURAN_API}/verses/by_chapter/${surahNum}?translations=${FARSI_TRANSLATION_ID}&fields=text_uthmani&per_page=300&page=1`;
+  const url = `${QURAN_API}/verses/by_chapter/${surahNum}?translations=${PERSIAN_TRANSLATION_ID}&fields=text_uthmani&per_page=300&page=1`;
   const data = await fetchJSON(url);
 
   if (!data || !data.verses) {
@@ -364,7 +364,7 @@ function showQuranVerse(index) {
     <div class="slide">
       ${showBismillah ? `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>` : ""}
       <div class="arabic-line">${v.ar}</div>
-      <div class="farsi-line">${v.fa}</div>
+      <div class="persian-line">${v.fa}</div>
     </div>
   `;
 
@@ -598,8 +598,8 @@ function updateFontSizeBtns() {
                (currentView === "quran" && quranVerses.length > 0   && !quranListOpen);
   const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen;
 
-  farsiPlusBtn.classList.toggle("hidden", !show);
-  farsiMinusBtn.classList.toggle("hidden", !show);
+  persianPlusBtn.classList.toggle("hidden", !show);
+  persianMinusBtn.classList.toggle("hidden", !show);
   audioPlayBtn.classList.toggle("hidden", !isQuranContent);
   controlsCenterEl.style.display = show ? "" : "none";
 }
@@ -616,18 +616,18 @@ function toggleContrast() {
   document.body.classList.toggle("dark-mode", isDarkMode);
 }
 
-function getFarsiFontSize() {
-  if (farsiFontSize === null) {
+function getPersianFontSize() {
+  if (persianFontSize === null) {
     const val = getComputedStyle(document.documentElement)
-      .getPropertyValue("--farsi-font-size").trim();
-    farsiFontSize = parseFloat(val) || 20;
+      .getPropertyValue("--persian-font-size").trim();
+    persianFontSize = parseFloat(val) || 20;
   }
-  return farsiFontSize;
+  return persianFontSize;
 }
 
-function setFarsiFontSize(size) {
-  farsiFontSize = Math.max(10, Math.min(60, size));
-  document.documentElement.style.setProperty("--farsi-font-size", farsiFontSize + "px");
+function setPersianFontSize(size) {
+  persianFontSize = Math.max(10, Math.min(60, size));
+  document.documentElement.style.setProperty("--persian-font-size", persianFontSize + "px");
 }
 
 
@@ -779,8 +779,8 @@ btnBackground.onclick = toggleBackground;
 btnCalendar.onclick   = toggleCalendar;
 btnMusic.onclick      = toggleMusic;
 contrastBtn.onclick   = toggleContrast;
-farsiPlusBtn.onclick  = () => setFarsiFontSize(getFarsiFontSize() + 2);
-farsiMinusBtn.onclick = () => setFarsiFontSize(getFarsiFontSize() - 2);
+persianPlusBtn.onclick  = () => setPersianFontSize(getPersianFontSize() + 2);
+persianMinusBtn.onclick = () => setPersianFontSize(getPersianFontSize() - 2);
 
 slideSlider.addEventListener("input", () => {
   showSlide(currentLines.length - Number(slideSlider.value), true, true);

@@ -12,7 +12,7 @@ The app supports four display modes, switchable from the floating control bar:
 
 | Icon | Mode | Description |
 |------|------|-------------|
-| 📖 | Quran Reader | Browse and read the Quran with Farsi translation and audio recitation |
+| 📖 | Quran Reader | Browse and read the Quran with Persian translation and audio recitation |
 | 🤲 | Dua Slideshow | Browse and display Duas slide by slide |
 | 🖼️ | Background | Full-page Islamic event background image based on today's Hijri date |
 | 🎦 | Webcam | Live camera feed behind the decorative frame |
@@ -24,7 +24,7 @@ The app supports four display modes, switchable from the floating control bar:
 ### Quran Reader
 - Full surah list with Arabic names, Persian translations, and Persian chapter numbers
 - Verse-by-verse navigation with slider and Persian digit counter
-- Farsi translation by Fooladvand (ID 29 via api.quran.com)
+- Persian translation by Fooladvand (ID 29 via api.quran.com)
 - Audio recitation via everyayah.com (Abdul Basit Murattal)
 - Bismillah displayed automatically on the first verse of applicable chapters
 - Amiri Quran font for complete Arabic glyph coverage
@@ -32,7 +32,7 @@ The app supports four display modes, switchable from the floating control bar:
 
 ### Dua Slideshow
 - JSON-driven dua files loaded from `db/`
-- Arabic text + Farsi translation per slide
+- Arabic text + Persian translation per slide
 - Alphabetically sorted dua list (by Persian name)
 - Slide counter and progress slider (Persian digits)
 - Deep-link URL: `?name=<uid>&id=<slide>`
@@ -68,7 +68,7 @@ The app supports four display modes, switchable from the floating control bar:
 ### General
 - **Live clock** — updates every minute, shown in the left FAB pill (Persian digits)
 - **Dark mode** toggle (🌓)
-- **Adjustable Farsi font size** (➖ / ➕), range 10px – 60px, visible only when content is active
+- **Adjustable Persian font size** (➖ / ➕), range 10px – 60px, visible only when content is active
 - **Keyboard navigation** — ← → Page Up/Down Space Enter
 - **Decorative CSS L-bracket corners** around the content frame (CSS-gradient-based, no images)
 - **Pill-style title bar** — title of current dua or surah shown in a pill matching the FAB style
@@ -115,7 +115,7 @@ nooraniyat/
 │
 ├── db/
 │   ├── manifest.json       # Index of all available dua/ziyarat files
-│   └── *.json              # Individual dua files (Arabic + Farsi content)
+│   └── *.json              # Individual dua files (Arabic + Persian content)
 │
 └── media/
     ├── backgrounds.json    # Hijri calendar → background image mapping
@@ -162,7 +162,7 @@ All mutable state lives as module-level `let` variables in `main.js`:
 | `quranSurahs` | array | Full surah list (cached after first load) |
 | `quranSurahsLoaded` | bool | Guard against re-fetching surah list |
 | `isDarkMode` | bool | Dark mode toggle state |
-| `farsiFontSize` | number | Current Farsi font size in px |
+| `persianFontSize` | number | Current Persian font size in px |
 | `webcamStream` | MediaStream | Active camera stream (or null) |
 | `calendarVisible` | bool | Calendar/azan block expanded state |
 | `cachedHijriMonth/Day` | number | Hijri date cached after aladhan fetch |
@@ -212,7 +212,7 @@ All three blocks share the same pill style: `rgba(245,240,225,0.88)` background,
 - ▶ / ◀ Prev/Next slide
 - Range slider — scrub to any slide (RTL, mirrored)
 - Slide counter — `currentSlide/total` in Persian digits
-- ➖ / ➕ Farsi font size
+- ➖ / ➕ Persian font size
 - ▷ Audio play (Quran mode only, separated by a gold divider)
 
 **Left block** (`#controls-left`) — calendar, azan, clock:
@@ -248,7 +248,7 @@ Four typefaces, all loaded locally except Amiri Quran:
 
 | Family | File | Used for |
 |---|---|---|
-| `SamimV1` (normal) | `Samim-v0.10.3.woff/ttf` | UI text, Farsi translations, FAB labels |
+| `SamimV1` (normal) | `Samim-v0.10.3.woff/ttf` | UI text, Persian translations, FAB labels |
 | `SamimV1` (bold) | `Samim-v0.10.3-Bold.woff/ttf` | Bold city name in calendar block |
 | `NotoNaskhArabic` | `NotoNaskhArabic-Regular.ttf` | Arabic text in dua slides and surah names |
 | `QuranTaha` | `QuranTaha.ttf` | Quranic Arabic fallback |
@@ -297,7 +297,7 @@ Individual dua file (e.g. `db/dua-kumayl.json`):
   "uid": "dua-kumayl",
   "name_fa": "دعای کمیل",
   "content": [
-    { "ar": "Arabic text", "fa": "Farsi translation", "m": "Optional meta / reference" }
+    { "ar": "Arabic text", "fa": "Persian translation", "m": "Optional meta / reference" }
   ]
 }
 ```

@@ -1,4 +1,4 @@
-/* ================================================= */
+﻿/* ================================================= */
 /* ==================== FONTS ====================== */
 /* ================================================= */
 
@@ -32,7 +32,7 @@
 /* ================================================= */
 
 :root {
-  --farsi-font-size: 20px;
+  --persian-font-size: 20px;
 }
 
 html, body {
@@ -74,7 +74,7 @@ body.dark-mode {
   display: block;
 }
 
-/* Blurred edge-fill — behind, covers full area */
+/* Blurred edge-fill â€” behind, covers full area */
 #bg-blur {
   position: absolute;
   inset: -60px;
@@ -84,7 +84,7 @@ body.dark-mode {
   filter: blur(35px) brightness(0.7) saturate(1.3);
 }
 
-/* Sharp main image — on top, fully visible without cropping */
+/* Sharp main image â€” on top, fully visible without cropping */
 #bg-sharp {
   position: absolute;
   inset: 0;
@@ -218,7 +218,7 @@ body.dark-mode #quran-sidebar button:hover {
 /* ============= CALENDAR / AZAN BLOCK ============= */
 /* ================================================= */
 
-/* ── inline calendar+azan inside left FAB block ── */
+/* â”€â”€ inline calendar+azan inside left FAB block â”€â”€ */
 #calendar-azan-block {
   display: none;
   flex-direction: row;
@@ -462,9 +462,9 @@ body.dark-mode #dua-content::after {
   text-align: center;
 }
 
-.farsi-line {
+.persian-line {
   font-family: SamimV1;
-  font-size: var(--farsi-font-size);
+  font-size: var(--persian-font-size);
   line-height: 1.8;
   text-align: center;
   width: 100%;
@@ -654,8 +654,8 @@ body.dark-mode #controls button {
   display: none;
 }
 
-#farsi-plus-btn.hidden,
-#farsi-minus-btn.hidden,
+#persian-plus-btn.hidden,
+#persian-minus-btn.hidden,
 #audio-play-btn.hidden {
   display: none;
 }
@@ -724,7 +724,7 @@ body.dark-mode .controls-sep {
   }
 
   :root {
-    --farsi-font-size: 20px;
+    --persian-font-size: 20px;
   }
 
   .meta-line {
@@ -747,3 +747,4 @@ body.dark-mode .controls-sep {
     gap: 2px;
   }
 }
+
