@@ -762,7 +762,7 @@ btnQuran.onclick = () => {
     dismissOverlays();
   } else {
     if (currentView !== "quran") showView("quran");
-    // Hide all content views so the list is the only thing visible
+    duaNameEl.textContent = "";
     duaSlidesEl.classList.remove("active");
     quranViewEl.classList.remove("active");
     quranSidebarEl.style.display = "grid";
