@@ -799,11 +799,12 @@ body.dark-mode .controls-sep {
   #controls {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 6px;
   }
 
   #controls-center { order: 1; }
-  #controls-left   { order: 2; max-width: 90vw; flex-wrap: wrap; justify-content: center; }
+  #controls-left   { order: 2; max-width: 90vw; flex-wrap: wrap; justify-content: center; overflow: visible; }
   #controls-right  { order: 3; }
 }
 
