@@ -77,6 +77,8 @@ let quranSurahs    = [];
 let quranVerses    = [];
 let currentSurah   = 0;
 let currentAudio   = null;
+let isAutoPlaying  = false;
+let autoPlayTimer  = null;
 
 // Cached Hijri date for background matching
 let cachedHijriMonth = 0;
@@ -376,8 +378,14 @@ function showQuranVerse(index) {
     </div>
   `;
 
+  const wasAutoPlaying = isAutoPlaying;
   stopAudio();
   audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
+
+  if (wasAutoPlaying) {
+    isAutoPlaying = true;
+    playVerseAudio(v.surah, v.ayah);
+  }
 }
 
 function getAudioUrl(surah, ayah) {
@@ -388,22 +396,33 @@ function getAudioUrl(surah, ayah) {
 
 function toggleVerseAudio(surah, ayah) {
   if (currentAudio && !currentAudio.paused) {
-    currentAudio.pause();
-    audioPlayBtn.textContent = "▷";
+    stopAudio();
     return;
   }
-  stopAudio();
+  isAutoPlaying = true;
+  playVerseAudio(surah, ayah);
+}
+
+function playVerseAudio(surah, ayah) {
+  if (currentAudio) { currentAudio.onended = null; currentAudio.pause(); currentAudio = null; }
   currentAudio = new Audio(getAudioUrl(surah, ayah));
   currentAudio.play();
   audioPlayBtn.textContent = "⏸";
-  currentAudio.onended = () => { audioPlayBtn.textContent = "▷"; };
+  currentAudio.onended = () => {
+    const next = currentSlide + 1;
+    if (isAutoPlaying && next < quranVerses.length && !quranVerses[next]?.isCredit) {
+      autoPlayTimer = setTimeout(() => showSlide(next), 1000);
+    } else {
+      isAutoPlaying = false;
+      audioPlayBtn.textContent = "▷";
+    }
+  };
 }
 
 function stopAudio() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio = null;
-  }
+  clearTimeout(autoPlayTimer);
+  isAutoPlaying = false;
+  if (currentAudio) { currentAudio.onended = null; currentAudio.pause(); currentAudio = null; }
   audioPlayBtn.textContent = "▷";
 }
 
