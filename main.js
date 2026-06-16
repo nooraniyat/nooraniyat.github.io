@@ -789,6 +789,7 @@ btnQuran.onclick = () => {
   if (quranSidebarEl.style.display !== "none") {
     dismissOverlays();
   } else {
+    stopAudio();
     if (currentView !== "quran") showView("quran");
     duaNameEl.textContent = "";
     duaSlidesEl.classList.remove("active");
