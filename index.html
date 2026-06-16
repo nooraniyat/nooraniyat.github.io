@@ -6,53 +6,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nooraniyat</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
 </head>
 
 <body>
+  <!-- Full-page event background (behind everything) -->
+  <div id="background-layer">
+    <div id="bg-blur"></div>
+    <div id="bg-sharp"></div>
+  </div>
+
+  <!-- Full-page webcam (behind decorative frame) -->
+  <div id="webcam-view">
+    <video id="webcam-feed" autoplay playsinline muted></video>
+  </div>
+
   <div id="container">
 
-    <!-- Sidebar -->
+    <!-- Sidebar: Dua list (dua mode) -->
     <div id="dua-list"></div>
+
+    <!-- Sidebar: Quran surah list (quran mode) -->
+    <div id="quran-sidebar"></div>
 
     <!-- Main screen -->
     <div id="screen">
 
-      <!-- Dua Name (Top Center) -->
-      <h2 id="dua-name"></h2>
-
-      <!-- Slide Content -->
-      <div id="dua-content">
-        <div class="slide">
-
-          <!-- Meta (Top Right, under name) -->
-          <div class="meta-line"></div>
-
-          <!-- Arabic (True Center) -->
-          <div class="arabic-line"></div>
-
-          <!-- Persian (Bottom Center) -->
-          <div class="farsi-line"></div>
-
+      <!-- Calendar + Azan compact block (toggleable) -->
+      <div id="calendar-azan-block">
+        <div id="cal-city-block">
+          <span id="city-display" title="کلیک برای تغییر شهر">—</span>
+          <div id="city-edit-row" style="display:none">
+            <input id="city-input" type="text" placeholder="شهر, کشور (مثلاً Tehran, Iran)" />
+            <button id="city-save-btn">ذخیره</button>
+          </div>
         </div>
+        <div id="cal-dates">
+          <span id="cal-hijri">—</span>
+          <span class="cal-sep">|</span>
+          <span id="cal-persian">—</span>
+          <span class="cal-sep">|</span>
+          <span id="cal-gregorian">—</span>
+        </div>
+        <div id="azan-times"></div>
       </div>
 
-      <!-- Controls -->
+      <!-- View title -->
+      <h2 id="dua-name"></h2>
+
+      <!-- Main content frame (decorative border) -->
+      <div id="dua-content">
+
+        <!-- Dua slides (dua mode) -->
+        <div id="dua-slides-container"></div>
+
+        <!-- Quran reader (quran mode) -->
+        <div id="quran-view"></div>
+
+
+      </div>
+
+      <!-- Controls / FAB bar -->
       <div id="controls">
-        <button id="home-btn" title="فهرست">☰</button>
-        <button id="prev-slide" title="پیشین">▶</button>
-        <input
-          type="range"
-          id="slide-slider"
-          min="1"
-          max="1"
-          value="1"
-          step="1"
-        />
-        <span id="slide-counter">0 / 0</span>
-        <button id="next-slide" title="پسین">◀</button>
-        <button id="contrast-btn" title="روشنایی">◐</button>
-        <button id="farsi-minus-btn" title="کوچک‌تر">𝐚</button>
-        <button id="farsi-plus-btn" title="بزرگ‌تر">𝐀</button>
+        <button id="btn-quran" title="قرآن">📖</button>
+        <button id="home-btn" title="فهرست دعا">🤲</button>
+
+        <span id="nav-group">
+          <button id="prev-slide" title="پیشین">▶</button>
+          <input type="range" id="slide-slider" min="1" max="1" value="1" step="1" />
+          <span id="slide-counter">۰ / ۰</span>
+          <button id="next-slide" title="پسین">◀</button>
+        </span>
+
+        <button id="btn-background" title="پس‌زمینه">🖼️</button>
+        <button id="btn-calendar" title="تقویم و اذان">📅</button>
+        <button id="btn-camera" title="دوربین">🎦</button>
+        <button id="contrast-btn" title="روشنایی">🌓</button>
+        <button id="farsi-minus-btn" title="کوچک‌تر">➖</button>
+        <button id="farsi-plus-btn" title="بزرگ‌تر">➕</button>
       </div>
 
     </div>
@@ -62,11 +94,7 @@
 
   <img
     src="//www.clustrmaps.com/map_v2.png?d=pB2RtEP2qTQXrIIXGr9x3a60TY4Zs8CTY25OcIsfUYU&cl=ffffff"
-    width="1"
-    height="1"
-    style="opacity:0.01;"
-    alt=""
+    width="1" height="1" style="opacity:0.01;" alt=""
   />
-
 </body>
 </html>

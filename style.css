@@ -20,7 +20,7 @@
 
 
 /* ================================================= */
-/* ================= PAGE LAYOUT =================== */
+/* ================= ROOT / PAGE =================== */
 /* ================================================= */
 
 :root {
@@ -29,21 +29,60 @@
 
 html, body {
   height: 100%;
+  margin: 0;
 }
 
 body {
-  margin: 0;
   font-family: SamimV1, sans-serif;
   background: #fafafa;
   color: #000;
   direction: rtl;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 body.dark-mode {
-  background: #000;
-  color: #fff;
+  background: #1a1a1a;
+  color: #eee;
+}
+
+
+/* ================================================= */
+/* ============== BACKGROUND LAYER ================= */
+/* ================================================= */
+
+#background-layer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.45;
+}
+
+#background-layer.active {
+  display: block;
+}
+
+/* Blurred edge-fill — behind, covers full area */
+#bg-blur {
+  position: absolute;
+  inset: -60px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(35px) brightness(0.7) saturate(1.3);
+}
+
+/* Sharp main image — on top, fully visible without cropping */
+#bg-sharp {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 
@@ -59,33 +98,88 @@ body.dark-mode {
   padding: 0;
   box-sizing: border-box;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 
 /* ================================================= */
-/* ================= SIDEBAR ======================= */
+/* ================= SIDEBARS ====================== */
 /* ================================================= */
 
-#dua-list {
-  width: 250px;
+#dua-list,
+#quran-sidebar {
+  width: 220px;
   overflow-y: auto;
   background: inherit;
   color: inherit;
+  flex-shrink: 0;
 }
 
-#dua-list button {
+#dua-list button,
+#quran-sidebar button {
+  display: block;
   width: 100%;
-  padding: 10px;
-  margin-bottom: 5px;
+  padding: 9px 10px;
+  margin-bottom: 4px;
   font-family: SamimV1;
+  font-size: 14px;
   cursor: pointer;
   background: inherit;
   color: inherit;
   border: 1px solid #ccc;
+  text-align: right;
 }
 
-body.dark-mode #dua-list button {
-  border-color: #555;
+#quran-sidebar button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.surah-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  direction: rtl;
+}
+
+.surah-num {
+  font-family: SamimV1, sans-serif;
+  font-size: 10px;
+  opacity: 0.5;
+  min-width: 18px;
+  text-align: center;
+}
+
+.surah-arabic {
+  font-family: NotoNaskhArabic, serif;
+  font-size: 13px;
+}
+
+.surah-trans {
+  font-family: SamimV1, sans-serif;
+  font-size: 10px;
+  opacity: 0.6;
+  direction: ltr;
+  text-align: left;
+}
+
+body.dark-mode #dua-list button,
+body.dark-mode #quran-sidebar button {
+  border-color: #444;
+}
+
+#dua-list button:hover,
+#quran-sidebar button:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+body.dark-mode #dua-list button:hover,
+body.dark-mode #quran-sidebar button:hover {
+  background: rgba(255,255,255,0.08);
 }
 
 
@@ -98,6 +192,149 @@ body.dark-mode #dua-list button {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
+}
+
+
+/* ================================================= */
+/* ============= CALENDAR / AZAN BLOCK ============= */
+/* ================================================= */
+
+/* ── outer wrapper: transparent, stacks the 3 sub-blocks ── */
+#calendar-azan-block {
+  display: none;
+  position: fixed;
+  left: 66px;
+  bottom: 120px;
+  z-index: 200;
+
+  font-family: SamimV1, sans-serif;
+  font-size: 11px;
+  direction: rtl;
+  color: #333;
+
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+  width: 140px;
+}
+
+#calendar-azan-block.visible {
+  display: flex;
+}
+
+body.dark-mode #calendar-azan-block {
+  color: #ddd;
+}
+
+/* ── shared sub-block style ── */
+#cal-city-block,
+#cal-dates,
+#azan-times {
+  background: rgba(245, 240, 225, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(200, 185, 122, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+  padding: 4px 8px;
+}
+
+body.dark-mode #cal-city-block,
+body.dark-mode #cal-dates,
+body.dark-mode #azan-times {
+  background: rgba(25, 20, 10, 0.88);
+  border-color: rgba(150, 130, 70, 0.4);
+}
+
+/* ── city sub-block ── */
+#city-display {
+  display: block;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  color: #7a5c00;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: center;
+}
+
+body.dark-mode #city-display {
+  color: #c8a040;
+}
+
+/* ── dates sub-block ── */
+#cal-dates {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  text-align: center;
+}
+
+#cal-dates span {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+#cal-gregorian {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.cal-sep {
+  display: none;
+}
+
+/* ── azan sub-block ── */
+#azan-times {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.azan-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.azan-label {
+  color: #888;
+}
+
+#city-edit-row {
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+#city-input {
+  font-family: SamimV1, sans-serif;
+  font-size: 12px;
+  padding: 3px 6px;
+  border: 1px solid #c8b97a;
+  background: #fffdf5;
+  color: #333;
+  direction: ltr;
+  width: 200px;
+}
+
+body.dark-mode #city-input {
+  background: #222;
+  color: #eee;
+  border-color: #555;
+}
+
+#city-save-btn {
+  font-family: SamimV1, sans-serif;
+  font-size: 12px;
+  padding: 3px 10px;
+  cursor: pointer;
+  background: #c8b97a;
+  border: none;
+  color: #222;
 }
 
 
@@ -108,13 +345,14 @@ body.dark-mode #dua-list button {
 #dua-name {
   text-align: center;
   font-size: 20px;
-  margin: 0px 0 10px 0;
+  margin: 6px 0 6px 0;
   flex-shrink: 0;
+  min-height: 28px;
 }
 
 
 /* ================================================= */
-/* ================= CONTENT ======================= */
+/* ================= CONTENT FRAME ================= */
 /* ================================================= */
 
 #dua-content {
@@ -123,10 +361,8 @@ body.dark-mode #dua-list button {
   flex-direction: column;
   position: relative;
   overflow: hidden;
-
   background-color: inherit;
 
-  /* Decorative GIF layers */
   background-image:
     url('assets/images/c4.gif'),
     url('assets/images/c1.gif'),
@@ -138,32 +374,45 @@ body.dark-mode #dua-list button {
     url('assets/images/ho2.gif');
 
   background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat-y,
-    repeat-y,
-    repeat-x,
-    repeat-x;
+    no-repeat, no-repeat, no-repeat, no-repeat,
+    repeat-y, repeat-y, repeat-x, repeat-x;
 
   background-position:
-    top left,
-    top right,
-    bottom left,
-    bottom right,
-    left top,
-    right top,
-    top left,
-    bottom left;
+    top left, top right, bottom left, bottom right,
+    left top, right top, top left, bottom left;
 
   background-origin: content-box;
   background-clip: border-box;
 }
 
+body.dark-mode #dua-content {
+  background-image: none;
+}
+
 
 /* ================================================= */
-/* ================= SLIDE STRUCTURE =============== */
+/* ============= VIEW CONTAINERS =================== */
+/* ================================================= */
+
+#dua-slides-container,
+#quran-view,
+#webcam-view {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+#dua-slides-container.active,
+#quran-view.active,
+#webcam-view.active {
+  display: flex;
+}
+
+
+/* ================================================= */
+/* ================= DUA SLIDES ==================== */
 /* ================================================= */
 
 .slide {
@@ -175,94 +424,204 @@ body.dark-mode #dua-list button {
   box-sizing: border-box;
 }
 
-
-/* -------- META (TOP) -------- */
-
 .meta-line {
-  text-align: right;      /* RTL metadata usually right */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-family: SamimV1;
   font-size: 20px;
   margin-bottom: 20px;
   flex-shrink: 0;
 }
 
-
-/* -------- ARABIC (CENTER) -------- */
-
 .arabic-line {
-  flex: 1;                         /* takes middle space */
+  flex: 1;
   display: flex;
-  justify-content: center;         /* horizontal center */
-  align-items: flex-start;             /* vertical center */
-  transform: translateY(+10%);  /* move up 20% of its own height */
-  font-family: QuranTaha, NotoNaskhArabic, serif;
+  justify-content: center;
+  align-items: flex-start;
+  transform: translateY(+10%);
+  font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
   font-size: 60px;
   line-height: 1.9;
   text-align: center;
-
 }
-
-
-/* -------- FARSI (BOTTOM) -------- */
 
 .farsi-line {
   font-family: SamimV1;
   font-size: var(--farsi-font-size);
   line-height: 1.8;
-
-  text-align: center;              /* FIX: centered */
+  text-align: center;
   width: 100%;
-
-  margin-top: auto;                /* pushes to bottom */
+  margin-top: auto;
   padding-top: 20px;
-
   flex-shrink: 0;
 }
 
 
 /* ================================================= */
-/* ================= CONTROLS ====================== */
+/* ================= QURAN READER ================== */
 /* ================================================= */
 
-#controls {
-  height: 60px;
+.bismillah {
+  font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
+  font-size: 32px;
+  text-align: center;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+  opacity: 0.75;
+}
+
+.verse-info {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  padding: 6px 0;
+}
+
+.verse-key {
+  font-family: NotoNaskhArabic, serif;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.audio-btn {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 4px;
+  opacity: 0.7;
+}
+
+.audio-btn:hover {
+  opacity: 1;
+}
+
+.quran-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: SamimV1;
+  color: #888;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  #quran-view {
+    padding: 10px 12px;
+  }
+}
+
+
+/* ================================================= */
+/* ================= WEBCAM VIEW =================== */
+/* ================================================= */
+
+#webcam-view {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#webcam-view.active {
+  display: block;
+}
+
+#webcam-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* ================================================= */
+/* ================= CONTROLS / FAB ================ */
+/* ================================================= */
+
+#controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  margin: 4px auto 6px;
+  padding: 4px 12px;
+
+  background: rgba(245, 240, 225, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(200, 185, 122, 0.5);
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+}
+
+body.dark-mode #controls {
+  background: rgba(25, 20, 10, 0.88);
+  border-color: rgba(150, 130, 70, 0.4);
 }
 
 #controls button {
-  padding: 5px 8px;
+  padding: 2px 6px;
   cursor: pointer;
-  background: inherit;
-  color: inherit;
-  border: 0px solid #ccc;
+  background: none;
+  color: #333;
+  border: none;
+  font-size: 15px;
+  line-height: 1;
 }
 
 body.dark-mode #controls button {
-  border-color: #555;
+  color: #eee;
 }
 
-body.dark-mode #dua-content {
-  background-image: none;
+#controls button:hover {
+  opacity: 0.7;
 }
 
+#controls button.active-view {
+  border-bottom: 2px solid currentColor;
+}
 
-/* ================================================= */
-/* ================= SLIDER ======================== */
-/* ================================================= */
+#nav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#nav-group.hidden {
+  display: none;
+}
 
 #slide-counter {
-  min-width: 50px;
+  min-width: 46px;
   text-align: center;
+  font-size: 13px;
 }
 
 #slide-slider {
-  width: 200px;
+  width: 140px;
   direction: rtl;
   transform: scaleX(-1);
+}
+
+.controls-sep {
+  width: 1px;
+  height: 24px;
+  background: rgba(0,0,0,0.15);
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+body.dark-mode .controls-sep {
+  background: rgba(255,255,255,0.15);
 }
 
 
@@ -271,15 +630,14 @@ body.dark-mode #dua-content {
 /* ================================================= */
 
 @media (max-width: 768px) {
-
   #container {
     flex-direction: column;
-    padding: 10px;
   }
 
-  #dua-list {
+  #dua-list,
+  #quran-sidebar {
     width: 100%;
-    max-height: 35vh;
+    max-height: 30vh;
   }
 
   .slide {
@@ -287,19 +645,31 @@ body.dark-mode #dua-content {
   }
 
   .arabic-line {
-    font-size: 24px;
+    font-size: 28px;
+  }
+
+  #quran-view {
+    padding: 10px 12px;
+  }
+
+  .quran-verse .arabic-line {
+    font-size: 28px;
   }
 
   :root {
-    --farsi-font-size: 12px;
+    --farsi-font-size: 13px;
   }
 
   .meta-line {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  #slide-slider {
+    width: 80px;
   }
 
   #controls {
-    height: 60px;
+    height: 52px;
+    gap: 4px;
   }
 }
-

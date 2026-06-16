@@ -1,197 +1,164 @@
-# Slide Viewer
+# Nooraniyat — داشبورد اسلامی
 
-A lightweight, framework-free slide presentation engine built with **HTML**, **CSS**, and **Vanilla JavaScript**.
+A lightweight, framework-free Islamic dashboard built with **HTML**, **CSS**, and **Vanilla JavaScript**.
 
-Clean. Fast. Offline-ready. Fully JSON-driven.
+Offline-capable. JSON-driven. Fully RTL.
+
+---
+
+## Views
+
+The app supports four display modes, switchable from the floating control bar:
+
+| Icon | Mode | Description |
+|------|------|-------------|
+| 📖 | Quran Reader | Browse and read the Quran with Farsi translation and audio recitation |
+| 🤲 | Dua Slideshow | Browse and display Duas slide by slide |
+| 🖼️ | Background | Full-page Islamic event background image based on today's Hijri date |
+| 🎦 | Webcam (سخنرانی) | Live camera feed behind the decorative frame |
 
 ---
 
 ## Features
 
-- Dynamic slide loading from JSON  
-- URL-based navigation (`?name=file&id=3`)  
-- Previous / Next controls  
-- Slide progress slider  
-- Responsive layout  
-- RTL support  
-- Optional dark mode  
-- Adjustable Farsi font size  
-- No frameworks  
-- No dependencies  
+### Quran Reader
+- Full surah list with Arabic names, Persian translations, and Persian chapter numbers
+- Verse-by-verse navigation with slider
+- Farsi translation by Fooladvand (ID 29 via api.quran.com)
+- Audio recitation via everyayah.com (Abdul Basit Murattal)
+- Bismillah displayed automatically on the first verse of applicable chapters
+- Amiri Quran font for complete Arabic glyph coverage
+
+### Dua Slideshow
+- JSON-driven dua files loaded from `db/`
+- Arabic text + Farsi translation per slide
+- URL-based deep linking (`?name=dua-name&id=3`)
+- Slide counter and progress slider
+
+### Calendar & Azan Block
+- Three separate compact panels (city / dates / prayer times), toggled with 📅
+- **Hijri date** — fetched from api.aladhan.com with Persian digits
+- **Persian (Jalali) date** — computed via jalaali-js with Persian digits
+- **Gregorian date** — day · month · year in Western digits
+- **Azan times** — Fajr, Sunrise, Dhuhr, Sunset, Maghrib in Persian digits
+- Calculation method: Institute of Geophysics, University of Tehran (method 7)
+- Default city: Waterloo, Ontario, Canada — click city name to change, persisted in localStorage
+
+### Background System
+- Hijri event manifest at `media/backgrounds.json`
+- Automatically selects the matching background image for today's Islamic date
+- Supports `start_hour` / `end_hour` for noon-based transitions (e.g. Muharram eve from noon of 29 Dhul-Hijja)
+
+### General
+- Dark mode toggle (🌓)
+- Adjustable Farsi font size (➖ / ➕), range 10px – 60px
+- Keyboard navigation (← → Page Up/Down Space Enter)
+- Decorative GIF frame around content area
+- RTL layout throughout
+- No frameworks, no build tools
 
 ---
 
 ## Project Structure
 
 ```text
-project/
+nooraniyat/
 │
 ├── index.html
 ├── style.css
 ├── main.js
 │
 ├── assets/
-│   ├── fonts/
-│   └── images/
+│   ├── fonts/          # SamimV1, NotoNaskhArabic, QuranTaha
+│   └── images/         # Decorative GIF frame pieces
 │
-└── db/
-    ├── manifest.json
-    ├── presentation-1.json
-    ├── presentation-2.json
-    └── ...
+├── db/
+│   ├── manifest.json   # List of available Duas
+│   └── *.json          # Individual Dua files
+│
+└── media/
+    ├── backgrounds.json  # Hijri event → image mapping
+    └── *.jpg             # Event background images
 ```
-
-All slide files are stored directly inside the `db/` folder.
 
 ---
 
-## Data Format
+## Dua File Format
 
-### manifest.json
-
-Lists available slide files:
+`db/manifest.json` — list of available Duas:
 
 ```json
 [
-  "presentation-1",
-  "presentation-2"
+  { "uid": "dua-kumayl", "name_fa": "دعای کمیل" }
 ]
 ```
 
-The app loads:
-
-```text
-db/presentation-1.json
-```
-
----
-
-### Slide File Structure
-
-Example: `presentation-1.json`
+Individual dua file (e.g. `db/dua-kumayl.json`):
 
 ```json
 {
-  "title": "Presentation Title",
-  "slides": [
-    {
-      "id": 1,
-      "meta": "Optional meta line",
-      "main": "Main slide content",
-      "sub": "Optional secondary content"
-    }
+  "uid": "dua-kumayl",
+  "name_fa": "دعای کمیل",
+  "content": [
+    { "ar": "Arabic text", "fa": "Farsi translation", "m": "Optional meta" }
   ]
 }
 ```
 
 ---
 
-## Navigation
+## Background Manifest Format
 
-Slides can be controlled using:
+`media/backgrounds.json`:
 
-- Previous / Next buttons  
-- Range slider  
-- Direct URL access  
-
----
-
-## Font Size
-
-The Farsi text size can be adjusted at any time using the **𝐚** and **𝐀** buttons in the controls bar at the bottom of each slide:
-
-| Button | Action |
-|--------|--------|
-| 𝐚 | Decrease Farsi font size |
-| 𝐀 | Increase Farsi font size |
-
-Each click changes the size by 2px (range: 10px – 60px). The adjustment applies instantly across all slides without reloading.
-
-> Arabic text size can be adjusted using the browser's built-in zoom (`Ctrl +` / `Ctrl -`).
-
-Example:
-
-```text
-http://localhost:8000/?name=presentation-1&id=3
+```json
+[
+  { "hijri_month": 1, "hijri_day": 10, "event_fa": "عاشورا", "image": "media/ashura.jpg" },
+  { "hijri_month": 12, "hijri_day": 29, "start_hour": 12, "event_fa": "آستانه محرم", "image": "media/muharram.jpg" }
+]
 ```
 
-Opens slide 3 directly.
+Place event images in `media/`. The app picks the entry matching today's Hijri date, respecting optional `start_hour` / `end_hour` for time-of-day transitions.
 
 ---
 
 ## Running Locally
 
-Because the app uses `fetch()`, you must run it with a local server.
-
-### Python
+The app uses `fetch()`, so a local server is required.
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open:
+Then open `http://localhost:8000`.
 
-```text
-http://localhost:8000
-```
-
-### VS Code
-
-Use the **Live Server** extension.
+Or use the **Live Server** extension in VS Code.
 
 ---
 
-## Customization
+## External APIs & Fonts
 
-Modify layout or typography inside:
-
-```text
-style.css
-```
-
-Example:
-
-```css
-.slide-main { font-size: 48px; }
-.slide-meta { font-size: 14px; }
-.slide-sub  { color: gray; }
-```
-
-Decorative assets can be replaced inside:
-
-```text
-assets/images/
-```
-
----
-
-## Responsive Design
-
-Mobile styles are handled via:
-
-```css
-@media (max-width: 768px) { }
-```
-
-Includes:
-
-- Reduced padding  
-- Scaled typography  
-- Stacked sidebar  
+| Service | Usage |
+|---------|-------|
+| api.quran.com/api/v4 | Quran Arabic text + Farsi translation |
+| api.aladhan.com/v1 | Hijri date conversion + prayer times |
+| everyayah.com | Verse-level audio recitation MP3s |
+| jalaali-js (jsDelivr CDN) | Persian (Jalali) calendar conversion |
+| Google Fonts — Amiri Quran | Full Quranic Arabic glyph support |
 
 ---
 
 ## Tech Stack
 
-- HTML5  
-- CSS3 (Flexbox)  
-- Vanilla JavaScript (ES6)  
-- JSON data source  
+- HTML5
+- CSS3 (Flexbox, backdrop-filter, CSS custom properties)
+- Vanilla JavaScript (ES6, async/await)
+- JSON data source
 
-No build tools required.
+No build tools. No dependencies.
 
 ---
 
 ## License
 
-Free to use for educational and presentation purposes.
+Free to use for educational, religious, and presentation purposes.
