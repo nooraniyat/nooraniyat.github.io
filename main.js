@@ -112,6 +112,7 @@ async function fetchJSON(path) {
 ================================================= */
 
 function showView(view) {
+  if (view !== "quran") stopAudio();
   currentView = view;
 
   // Deactivate all view containers
