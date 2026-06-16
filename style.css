@@ -121,19 +121,20 @@ body.dark-mode {
   position: absolute;
   inset: 0;
   z-index: 10;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   align-content: center;
   gap: 8px;
-  padding: 72px;
+  padding: 20px;
 
-  background: transparent;
+  background: #fafafa;
 }
 
 body.dark-mode #dua-list,
 body.dark-mode #quran-sidebar {
-  background: transparent;
+  background: #1a1a1a;
 }
 
 #dua-list button,
@@ -702,7 +703,7 @@ body.dark-mode .controls-sep {
   #dua-list,
   #quran-sidebar {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    padding: 72px 40px;
+    padding: 20px;
     gap: 6px;
   }
 

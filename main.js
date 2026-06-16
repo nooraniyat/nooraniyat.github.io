@@ -145,7 +145,6 @@ function showView(view) {
     }
   } else if (view === "quran") {
     quranSidebarEl.style.display = "grid";
-    quranViewEl.classList.add("active");
     navGroupEl.classList.remove("hidden");
     if (!quranSurahsLoaded) loadQuranSurahs();
     history.replaceState(null, "", "?list=quran");
@@ -314,6 +313,7 @@ async function loadQuranSurah(surahNum, updateURL = true) {
   currentSurah = surahNum;
   stopAudio();
   quranSidebarEl.style.display = "none";
+  quranViewEl.classList.add("active");
 
   const surah = quranSurahs.find(s => s.id === surahNum);
   duaNameEl.textContent = surah ? `${toFaDigits(surah.id)}. ${surah.name_arabic}` : "";
@@ -638,6 +638,12 @@ function setFarsiFontSize(size) {
 function dismissOverlays() {
   duaListEl.style.display = "none";
   quranSidebarEl.style.display = "none";
+  // Restore the content view that was showing before the list opened
+  if (currentView === "dua" && currentLines.length > 0) {
+    duaSlidesEl.classList.add("active");
+  } else if (currentView === "quran" && currentSurah) {
+    quranViewEl.classList.add("active");
+  }
   // Restore content URL or clear
   if (currentView === "dua" && currentFolder) {
     // showSlide already set the dua URL — leave it
@@ -739,24 +745,28 @@ async function toggleMusic() {
 prevBtn.onclick   = () => showSlide(currentSlide - 1);
 nextBtn.onclick   = () => showSlide(currentSlide + 1);
 homeBtn.onclick = () => {
-  if (currentView !== "dua") {
-    showView("dua");
+  if (duaListEl.style.display !== "none") {
+    dismissOverlays();
+  } else {
+    if (currentView !== "dua") showView("dua");
+    // Hide all content views so the list is the only thing visible
+    duaSlidesEl.classList.remove("active");
+    quranViewEl.classList.remove("active");
     duaListEl.style.display = "grid";
     history.replaceState(null, "", "?list=dua");
-  } else {
-    duaListEl.style.display = duaListEl.style.display === "none" ? "grid" : "none";
-    if (duaListEl.style.display !== "none") history.replaceState(null, "", "?list=dua");
-    else dismissOverlays();
+    updateFontSizeBtns();
   }
-  updateFontSizeBtns();
 };
 btnQuran.onclick = () => {
-  if (currentView !== "quran") {
-    showView("quran"); // sets ?list=quran internally
+  if (quranSidebarEl.style.display !== "none") {
+    dismissOverlays();
   } else {
-    quranSidebarEl.style.display = quranSidebarEl.style.display === "none" ? "grid" : "none";
-    if (quranSidebarEl.style.display !== "none") history.replaceState(null, "", "?list=quran");
-    else dismissOverlays();
+    if (currentView !== "quran") showView("quran");
+    // Hide all content views so the list is the only thing visible
+    duaSlidesEl.classList.remove("active");
+    quranViewEl.classList.remove("active");
+    quranSidebarEl.style.display = "grid";
+    history.replaceState(null, "", "?list=quran");
     updateFontSizeBtns();
   }
 };
