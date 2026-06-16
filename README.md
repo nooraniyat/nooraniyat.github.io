@@ -1,4 +1,4 @@
-# Nooraniyat — داشبورد اسلامی
+# Nooraniyat
 
 A lightweight, framework-free Islamic dashboard built with **HTML**, **CSS**, and **Vanilla JavaScript**.
 
