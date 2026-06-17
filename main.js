@@ -2,12 +2,10 @@
    CONFIG
 ================================================= */
 
-const dbFolder = "db";
+const dbFolder = "db/dua";
 const manifestFile = `${dbFolder}/manifest.json`;
-const QURAN_API = "https://api.quran.com/api/v4";
-const PERSIAN_TRANSLATION_ID = 29; // Fooladvand (Persian)
 const ALADHAN_API = "https://api.aladhan.com/v1";
-const AUDIO_BASE = "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/";
+const AUDIO_BASE = "db/audio/";
 
 
 /* =================================================
@@ -55,7 +53,6 @@ const currentTimeEl   = document.getElementById("current-time");
 const controlsCenterEl = document.getElementById("controls-center");
 
 const CREDIT_SLIDE       = { ar: "التماس دعا",           fa: null, m: null, isCredit: true };
-const QURAN_CREDIT_SLIDE = { ar: "صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم", fa: "راست گفت خدای بلندمرتبه و با عظمت", m: null, isCredit: true };
 
 
 /* =================================================
@@ -129,8 +126,8 @@ function showView(view) {
   // Stop webcam unless entering webcam mode
   if (view !== "webcam") stopWebcam();
 
-  // Track previous non-background view for toggle-back
-  if (view !== "background") previousView = view;
+  // Track previous non-overlay view for toggle-back
+  if (view !== "background" && view !== "webcam") previousView = view;
 
   // Active view button styling
   btnQuran.classList.toggle("active-view", view === "quran");
@@ -165,8 +162,28 @@ function showView(view) {
     loadBackground();
   }
 
-  // Clear URL if leaving dua or quran
-  if (view !== "dua" && view !== "quran") {
+  if (view === "webcam" || view === "background") {
+    history.replaceState(null, "", "?view=" + view);
+  } else if (view === "dua") {
+    if (currentFolder && currentLines.length > 0) {
+      const params = new URLSearchParams();
+      params.set("name", currentFolder);
+      params.set("id", currentSlide + 1);
+      history.replaceState(null, "", "?" + params.toString());
+    } else {
+      history.replaceState(null, "", window.location.pathname);
+    }
+  } else if (view === "quran") {
+    if (currentSurah) {
+      const params = new URLSearchParams();
+      params.set("quran", currentSurah);
+      const hasBismillah = currentLines[0]?.isBismillah;
+      params.set("id", hasBismillah ? currentSlide : currentSlide + 1);
+      history.replaceState(null, "", "?" + params.toString());
+    } else {
+      history.replaceState(null, "", "?list=quran");
+    }
+  } else {
     history.replaceState(null, "", window.location.pathname);
   }
 
@@ -227,7 +244,7 @@ function updateNavUI() {
   if (slideCounter)
     slideCounter.textContent = `${toFaDigits(displayNum)} / ${toFaDigits(displayTotal)}`;
   if (slideSlider)
-    slideSlider.value = currentLines.length - currentSlide;
+    slideSlider.value = currentSlide + 1;
   if (prevBtn) prevBtn.disabled = currentSlide === 0;
   if (nextBtn) nextBtn.disabled = currentSlide === currentLines.length - 1;
 }
@@ -252,7 +269,7 @@ async function displayDua(folder, slideIndex = 0) {
   if (slideSlider) {
     slideSlider.min   = 1;
     slideSlider.max   = currentLines.length;
-    slideSlider.value = Math.max(1, currentLines.length - slideIndex);
+    slideSlider.value = slideIndex + 1;
   }
 
   navGroupEl.classList.remove("hidden");
@@ -295,23 +312,21 @@ async function loadQuranSurahs() {
   navGroupEl.classList.add("hidden");
   updateFontSizeBtns();
 
-  const data = await fetchJSON(`${QURAN_API}/chapters?language=fa`);
-  if (!data || !data.chapters) {
+  const data = await fetchJSON("db/quran/manifest.json");
+  if (!data || !Array.isArray(data)) {
     quranViewEl.innerHTML = `<div class="quran-loading">خطا در بارگذاری</div>`;
     return;
   }
 
-  quranSurahs = data.chapters;
+  quranSurahs = data;
   quranSurahsLoaded = true;
 
   quranSidebarEl.innerHTML = "";
   for (const s of quranSurahs) {
     const btn = document.createElement("button");
-    const nameFa = s.translated_name?.name || "";
     btn.innerHTML = `
       <span class="surah-num">${toFaDigits(s.id)}</span>
       <span class="surah-arabic">${s.name_arabic}</span>
-      <span class="surah-trans">${nameFa}</span>
     `;
     btn.onclick = () => loadQuranSurah(s.id);
     quranSidebarEl.appendChild(btn);
@@ -331,33 +346,33 @@ async function loadQuranSurah(surahNum, updateURL = true) {
 
   quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری...</div>`;
 
-  const url = `${QURAN_API}/verses/by_chapter/${surahNum}?translations=${PERSIAN_TRANSLATION_ID}&fields=text_uthmani&per_page=300&page=1`;
-  const data = await fetchJSON(url);
+  const pad = String(surahNum).padStart(3, "0");
+  const data = await fetchJSON(`db/quran/${pad}.json`);
 
-  if (!data || !data.verses) {
+  if (!data || !Array.isArray(data)) {
     quranViewEl.innerHTML = `<div class="quran-loading">خطا در بارگذاری آیات</div>`;
     return;
   }
 
-  const verses = data.verses.map(v => ({
-    key: v.verse_key,
-    ar: v.text_uthmani || "",
-    fa: (v.translations?.[0]?.text || "").replace(/<[^>]+>/g, ""),
+  const verses = data.map(v => ({
+    key: `${surahNum}:${v.ayah}`,
+    ar: v.ar,
+    fa: v.fa,
     surah: surahNum,
-    ayah: v.verse_number
+    ayah: v.ayah
   }));
 
   const needsBismillah = surahNum !== 1 && surahNum !== 9;
   quranVerses = needsBismillah
-    ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: "به نام خداوند بخشنده و مهربان", isBismillah: true, surah: surahNum, ayah: 0 }, ...verses, QURAN_CREDIT_SLIDE]
-    : [...verses, QURAN_CREDIT_SLIDE];
+    ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: "به نام خداوند بخشنده و مهربان", isBismillah: true, surah: surahNum, ayah: 0 }, ...verses]
+    : [...verses];
   currentLines = quranVerses;
   currentSlide = 0;
 
   if (slideSlider) {
     slideSlider.min   = 1;
     slideSlider.max   = currentLines.length;
-    slideSlider.value = currentLines.length;
+    slideSlider.value = 1;
   }
 
   navGroupEl.classList.remove("hidden");
@@ -370,14 +385,6 @@ function showQuranVerse(index) {
   if (!quranVerses.length) return;
   index = Math.max(0, Math.min(index, quranVerses.length - 1));
   currentSlide = index;
-
-  if (quranVerses[index].isCredit) {
-    quranViewEl.innerHTML = createSlideHTML(quranVerses[index]);
-    stopAudio();
-    updateFontSizeBtns();
-    updateNavUI();
-    return;
-  }
 
   const v = quranVerses[index];
   const wasAutoPlaying = isAutoPlaying;
@@ -430,7 +437,7 @@ function playVerseAudio(surah, ayah) {
   audioPlayBtn.textContent = "⏸";
   currentAudio.onended = () => {
     const next = currentSlide + 1;
-    if (isAutoPlaying && next < quranVerses.length && !quranVerses[next]?.isCredit) {
+    if (isAutoPlaying && next < quranVerses.length) {
       autoPlayTimer = setTimeout(() => showSlide(next), 1000);
     } else {
       isAutoPlaying = false;
@@ -633,8 +640,7 @@ function updateFontSizeBtns() {
 
   const show = (currentView === "dua"   && currentLines.length > 0  && !duaListOpen) ||
                (currentView === "quran" && quranVerses.length > 0   && !quranListOpen);
-  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen
-    && !quranVerses[currentSlide]?.isCredit;
+  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen;
 
   persianPlusBtn.classList.toggle("hidden", !show);
   persianMinusBtn.classList.toggle("hidden", !show);
@@ -661,6 +667,11 @@ function updateClock() {
 function toggleContrast() {
   isDarkMode = !isDarkMode;
   document.body.classList.toggle("dark-mode", isDarkMode);
+  const params = new URLSearchParams(window.location.search);
+  if (isDarkMode) params.set("dark", "1");
+  else params.delete("dark");
+  const qs = params.toString();
+  history.replaceState(null, "", qs ? "?" + qs : window.location.pathname);
 }
 
 function getPersianFontSize() {
@@ -702,19 +713,7 @@ function dismissOverlays() {
   updateFontSizeBtns();
 }
 
-duaListEl.addEventListener("click", (e) => {
-  if (e.target === duaListEl) {
-    dismissOverlays();
-    if (currentLines.length === 0) goHome();
-  }
-});
 
-quranSidebarEl.addEventListener("click", (e) => {
-  if (e.target === quranSidebarEl) {
-    dismissOverlays();
-    if (quranVerses.length === 0) goHome();
-  }
-});
 
 document.addEventListener("keydown", (e) => {
   if (e.target === cityInputEl) return;
@@ -727,10 +726,10 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
-  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " || e.key === "Enter") {
+  if (e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Enter") {
     if (currentLines.length) showSlide(currentSlide + 1);
   }
-  if (e.key === "ArrowLeft" || e.key === "PageUp") {
+  if (e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "PageUp") {
     if (currentLines.length) showSlide(currentSlide - 1);
   }
   if (e.key === "Home") goHome();
@@ -819,7 +818,7 @@ btnQuran.onclick = () => {
   }
 };
 btnCamera.onclick = () => {
-  if (currentView === "webcam") showView("dua");
+  if (currentView === "webcam") showView(previousView);
   else showView("webcam");
 };
 
@@ -842,7 +841,7 @@ persianPlusBtn.onclick  = () => setPersianFontSize(getPersianFontSize() + 2);
 persianMinusBtn.onclick = () => setPersianFontSize(getPersianFontSize() - 2);
 
 slideSlider.addEventListener("input", () => {
-  showSlide(currentLines.length - Number(slideSlider.value), true, true);
+  showSlide(Number(slideSlider.value) - 1, true, true);
 });
 
 // City editing
@@ -886,6 +885,12 @@ async function init() {
   const idRaw      = params.get("id");
   const idParam    = idRaw !== null ? parseInt(idRaw, 10) : null;
   const listParam  = params.get("list");
+  const viewParam  = params.get("view");
+
+  if (params.get("dark") === "1") {
+    isDarkMode = true;
+    document.body.classList.add("dark-mode");
+  }
 
   if (nameParam) {
     const folders   = await fetchJSON(manifestFile) || [];
@@ -925,6 +930,11 @@ async function init() {
     await loadQuranSurahs();
     showView("quran");
     updateFontSizeBtns();
+    return;
+  }
+
+  if (viewParam === "webcam" || viewParam === "background") {
+    showView(viewParam);
     return;
   }
 

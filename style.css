@@ -149,7 +149,7 @@ body.dark-mode #quran-sidebar {
   gap: 1px;
   padding: 4px 6px;
   font-family: SamimV1, sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   cursor: pointer;
   color: inherit;
   text-align: center;
@@ -180,7 +180,6 @@ body.dark-mode #quran-sidebar button:hover {
 }
 
 #quran-sidebar {
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   align-content: start;
 }
 
@@ -191,13 +190,13 @@ body.dark-mode #quran-sidebar button:hover {
 
 .surah-num {
   font-family: SamimV1, sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   opacity: 0.45;
 }
 
 .surah-arabic {
   font-family: NotoNaskhArabic, serif;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .surah-trans {
@@ -249,7 +248,7 @@ body.dark-mode #calendar-azan-block {
 
 #city-display {
   cursor: pointer;
-  text-decoration: underline dotted;
+  text-decoration: none;
   color: #7a5c00;
   font-size: 10px;
   font-weight: bold;
@@ -493,10 +492,14 @@ body.dark-mode #dua-content::after {
   display: block;
   margin-top: auto;
   padding-bottom: 12px;
-  font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
+  font-family: QuranTaha;
   font-size: 70px;
   line-height: 1.9;
   text-align: center;
+}
+
+#quran-view .arabic-line {
+  font-family: QuranTaha;
 }
 
 .arabic-line::after {
@@ -520,6 +523,10 @@ body.dark-mode #dua-content::after {
   flex-shrink: 0;
 }
 
+body.dark-mode .persian-line {
+  color: #fff;
+}
+
 
 /* ================================================= */
 /* ================= QURAN READER ================== */
@@ -527,7 +534,7 @@ body.dark-mode #dua-content::after {
 
 
 .bismillah {
-  font-family: "Amiri Quran", QuranTaha, NotoNaskhArabic, serif;
+  font-family: QuranTaha;
   font-size: 32px;
   text-align: center;
   flex-shrink: 0;
@@ -545,7 +552,7 @@ body.dark-mode #dua-content::after {
 }
 
 .verse-key {
-  font-family: NotoNaskhArabic, serif;
+  font-family: QuranTaha;
   font-size: 13px;
   opacity: 0.6;
 }
@@ -722,7 +729,7 @@ body.dark-mode #controls button {
 
 #slide-slider {
   width: 140px;
-  direction: rtl;
+  direction: ltr;
   transform: scaleX(-1);
 }
 
@@ -744,6 +751,10 @@ body.dark-mode .controls-sep {
 /* ================================================= */
 
 @media (max-width: 768px) {
+  #dua-content::after {
+    display: none;
+  }
+
   #container {
     flex-direction: column;
   }
