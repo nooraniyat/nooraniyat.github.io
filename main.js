@@ -5,7 +5,7 @@
 const dbFolder = "db/dua";
 const manifestFile = `${dbFolder}/manifest.json`;
 const ALADHAN_API = "https://api.aladhan.com/v1";
-const AUDIO_BASE = "db/audio/";
+const AUDIO_BASE = "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/";
 
 
 /* =================================================
