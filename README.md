@@ -22,16 +22,14 @@ The app supports four display modes, switchable from the floating control bar:
 ## Features
 
 ### Quran Reader
-- Full surah list with Arabic names, Persian translations, and Persian chapter numbers
+- Full surah list with Arabic names and Persian chapter numbers
+- **All Quran text stored locally** — Arabic (Uthmani script) and Persian translation (Fooladvand) pre-downloaded into `db/quran/` JSON files; no API call needed to read the Quran
+- **Audio recitation streamed on demand** — MP3 files fetched from everyayah.com (Abdul Basit Murattal) only when the play button is pressed
 - Verse-by-verse navigation with slider and Persian digit counter
-- Persian translation by Fooladvand (ID 29 via api.quran.com)
-- Audio recitation via everyayah.com (Abdul Basit Murattal)
 - **Auto-advance playback** — after each verse ends, the next verse loads and plays automatically after a 1-second pause; pressing pause stops auto-advance
 - Audio stops automatically when switching views or opening the surah list
 - **Bismillah on its own slide** — بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ appears as a dedicated first slide with Persian translation "به نام خداوند بخشنده و مهربان" and its own audio recitation (`{surah}000.mp3`) for all surahs except Al-Fatiha (1) and At-Tawbah (9)
 - **Bismillah numbered as slide 0** — the counter starts at ۰ for Bismillah, ۱ for the first verse; surahs without Bismillah start at ۱ as normal
-- Closing slide: **صَدَقَ اللَّهُ الْعَلِيُّ الْعَظِيم** with Persian translation appended after the last verse; audio play button is hidden on this slide
-- Amiri Quran font for complete Arabic glyph coverage
 - Deep-link URL: `?quran=<surah>&id=<n>` where `n` is 0 for Bismillah, 1 for verse 1
 
 ### Dua Slideshow
@@ -135,8 +133,12 @@ nooraniyat/
 │   └── images/             # Decorative PNG assets
 │
 ├── db/
-│   ├── manifest.json       # Index of all available dua/ziyarat files
-│   └── *.json              # Individual dua files (Arabic + Persian content)
+│   ├── dua/
+│   │   ├── manifest.json   # Index of all available dua/ziyarat files
+│   │   └── *.json          # Individual dua files (Arabic + Persian content)
+│   └── quran/
+│       ├── manifest.json   # Surah list (id, name_arabic, verses_count)
+│       └── 001.json…114.json  # Per-surah verses (Arabic Uthmani + Fooladvand Persian)
 │
 └── media/
     ├── background/
@@ -253,7 +255,7 @@ On screens narrower than 620 px (container query on `#screen`), the three blocks
 - `playVerseAudio(surah, ayah)` — fetches MP3 from everyayah.com and plays it; on `ended`, if `isAutoPlaying` is true, waits 1 second then advances to the next verse
 - `stopAudio()` — cancels the auto-advance timer, clears `isAutoPlaying`, pauses and discards the Audio element, resets the play button
 - `toggleVerseAudio()` — if not playing, sets `isAutoPlaying = true` and starts; if playing, calls `stopAudio()`
-- Auto-advance stops at the credit slide (صَدَقَ اللَّهُ) and does not loop
+- Auto-advance stops at the last verse and does not loop
 
 ### Data Layer
 
@@ -261,8 +263,10 @@ On screens narrower than 620 px (container query on `#screen`), the three blocks
 
 | File | Schema | Consumer |
 |---|---|---|
-| `db/manifest.json` | `[{uid, name_fa, name_ar}]` | `loadDuaList()` builds dua tile grid |
-| `db/<uid>.json` | `{uid, name_fa, content:[{ar,fa,m}]}` | `displayDua()` builds slide stack |
+| `db/dua/manifest.json` | `[{uid, name_fa, name_ar}]` | `loadDuaList()` builds dua tile grid |
+| `db/dua/<uid>.json` | `{uid, name_fa, content:[{ar,fa,m}]}` | `displayDua()` builds slide stack |
+| `db/quran/manifest.json` | `[{id, name_arabic, verses_count, …}]` | `loadQuranSurahs()` builds surah tile grid |
+| `db/quran/<NNN>.json` | `[{ayah, ar, fa}]` | `loadQuranSurah()` builds verse slides |
 | `media/background/backgrounds.json` | `[{hijri_month, hijri_day, start_hour?, end_hour?, event_fa, image}]` | `loadBackground()` selects event image |
 | `media/music/playlist.json` | `["file.mp3", ...]` | `toggleMusic()` loads shuffle playlist |
 
@@ -270,13 +274,11 @@ On screens narrower than 620 px (container query on `#screen`), the three blocks
 
 | API | Endpoint | Used for |
 |---|---|---|
-| api.quran.com/api/v4 | `/chapters?language=fa` | Surah list with Persian names |
-| api.quran.com/api/v4 | `/verses/by_chapter/<n>?translations=29&...` | Verse text + Fooladvand translation |
 | api.aladhan.com/v1 | `/gToH/<date>` | Gregorian → Hijri date conversion |
 | api.aladhan.com/v1 | `/timingsByCity?city=…&method=7` | Daily prayer times |
-| everyayah.com | `/data/Abdul_Basit_Murattal_192kbps/<verse>.mp3` | Per-verse audio recitation |
+| everyayah.com | `/data/Abdul_Basit_Murattal_192kbps/<verse>.mp3` | Per-verse audio recitation (streamed on demand) |
 | jsDelivr CDN | `jalaali-js` | Jalali (Solar Hijri) calendar conversion |
-| Google Fonts | `Amiri+Quran` | Full Quranic Arabic glyph coverage |
+| Google Fonts | `Amiri+Quran` | Quranic Arabic glyph coverage |
 
 ### Font System
 
@@ -327,7 +329,7 @@ The four gold L-bracket corners around `#dua-content` are pure CSS — no images
 
 ## Dua File Format
 
-`db/manifest.json` — index of available content:
+`db/dua/manifest.json` — index of available content:
 
 ```json
 [
@@ -335,7 +337,7 @@ The four gold L-bracket corners around `#dua-content` are pure CSS — no images
 ]
 ```
 
-Individual dua file (e.g. `db/dua-kumayl.json`):
+Individual dua file (e.g. `db/dua/dua-kumayl.json`):
 
 ```json
 {
