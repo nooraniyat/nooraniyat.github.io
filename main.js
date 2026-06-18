@@ -27,6 +27,7 @@ const slideCounter    = document.getElementById("slide-counter");
 const slideSlider     = document.getElementById("slide-slider");
 const navGroupEl      = document.getElementById("nav-group");
 const homeBtn         = document.getElementById("home-btn");
+const btnHomeLink     = document.getElementById("btn-home-link");
 const contrastBtn     = document.getElementById("contrast-btn");
 const persianPlusBtn    = document.getElementById("persian-plus-btn");
 const persianMinusBtn   = document.getElementById("persian-minus-btn");
@@ -196,6 +197,32 @@ function showView(view) {
 ================================================= */
 
 
+function flyOutText(el) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const clone = el.cloneNode(true);
+  clone.style.position = "fixed";
+  clone.style.left = rect.left + "px";
+  clone.style.top = rect.top + "px";
+  clone.style.width = rect.width + "px";
+  clone.style.margin = "0";
+  clone.classList.add("text-leaving");
+  document.body.appendChild(clone);
+  clone.addEventListener("animationend", () => clone.remove(), { once: true });
+}
+
+function prepareTextTransition(container) {
+  flyOutText(container.querySelector(".arabic-line"));
+  flyOutText(container.querySelector(".persian-line"));
+}
+
+function markTextEntering(container) {
+  for (const el of container.querySelectorAll(".arabic-line, .persian-line")) {
+    el.classList.add("text-entering");
+    el.addEventListener("animationend", () => el.classList.remove("text-entering"), { once: true });
+  }
+}
+
 function createSlideHTML(line) {
   return `
     <div class="slide">
@@ -214,7 +241,9 @@ function showSlide(index, updateURL = true, fromSlider = false) {
   currentSlide = index;
 
   if (currentView === "dua") {
+    prepareTextTransition(duaSlidesEl);
     duaSlidesEl.innerHTML = createSlideHTML(currentLines[index]);
+    markTextEntering(duaSlidesEl);
   } else if (currentView === "quran") {
     showQuranVerse(index);
   }
@@ -390,21 +419,14 @@ function showQuranVerse(index) {
   const wasAutoPlaying = isAutoPlaying;
   stopAudio();
 
-  if (v.isBismillah) {
-    quranViewEl.innerHTML = `
-      <div class="slide">
-        <div class="arabic-line">${v.ar}</div>
-        <div class="persian-line">${v.fa}</div>
-      </div>
-    `;
-  } else {
-    quranViewEl.innerHTML = `
-      <div class="slide">
-        <div class="arabic-line">${v.ar}</div>
-        <div class="persian-line">${v.fa}</div>
-      </div>
-    `;
-  }
+  prepareTextTransition(quranViewEl);
+  quranViewEl.innerHTML = `
+    <div class="slide">
+      <div class="arabic-line">${v.ar}</div>
+      <div class="persian-line">${v.fa}</div>
+    </div>
+  `;
+  markTextEntering(quranViewEl);
 
   audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
   updateFontSizeBtns();
@@ -821,6 +843,8 @@ btnCamera.onclick = () => {
   if (currentView === "webcam") showView(previousView);
   else showView("webcam");
 };
+
+btnHomeLink.onclick   = goHome;
 
 btnBackground.onclick = toggleBackground;
 btnCalendar.onclick   = toggleCalendar;

@@ -75,7 +75,9 @@ The app supports four display modes, switchable from the floating control bar:
 - **Fullscreen** toggle (⛶) — enters/exits browser fullscreen; icon changes to ⊡ when active
 - **Adjustable Persian font size** (➖ / ➕), range 10px – 60px, visible only when content is active
 - **Keyboard navigation** — ← → Page Up/Down Space Enter
-- **Decorative CSS L-bracket corners** around the content frame — gold color, black glow, CSS-gradient-based (no images)
+- **Decorative CSS L-bracket corners** around the content frame — gold color, CSS-gradient-based (no images)
+- **Fade transition between slides** — outgoing Arabic/Persian text fades out and the next slide's text fades in, under 0.5s, never blocked by rapid navigation
+- **Home FAB** (🏠) — rightmost button in the right control pill; returns to the dua list via client-side navigation (no page reload), so dark mode, music playback, and fullscreen state are preserved
 - **Pill-style title bar** — title of current dua or surah shown in a pill with decorative fading side lines
 - **Responsive FAB bar** — on narrow screens the three pill blocks stack vertically (center → calendar → icons) via CSS container queries
 - **Single-point background color** — change `--base-bg` in `:root` to retheme the entire app
@@ -165,7 +167,7 @@ nooraniyat/
         #quran-sidebar         ← absolute overlay, z-index 10; surah tile grid
         ::after                ← absolute overlay, z-index 20; CSS L-brackets
       #controls              ← 3-pill FAB bar (stacks on narrow screens)
-        #controls-right      ← [📖][🤲][🖼️][🎦][🌓][🎵][⛶]
+        #controls-right      ← [🏠][📖][🤲][🖼️][🎦][🌓][🎵][⛶]
         #controls-center     ← [◀][slider][۳/۱۲][▶][➖][➕][▷]
         #controls-left       ← [📅][city/dates/azan] … [time]
 ```
@@ -231,6 +233,7 @@ All three blocks share the same pill style: `rgba(245,240,225,0.88)` background,
 On screens narrower than 620 px (container query on `#screen`), the three blocks stack vertically: center navigation first, then calendar, then view controls.
 
 **Right block** (`#controls-right`) — view & mode controls:
+- 🏠 Home — returns to the dua list without reloading the page (preserves dark mode, music, fullscreen)
 - 📖 Quran — opens quran list / toggles sidebar
 - 🤲 Dua — opens dua list / toggles list
 - 🖼️ Background — toggles background view
@@ -318,12 +321,11 @@ The four gold L-bracket corners around `#dua-content` are pure CSS — no images
   background-image: 8× linear-gradient(gold, gold);  /* 2 strips per corner */
   background-size: 64px×8px (H arm), 8px×64px (V arm);
   background-position: corner offsets (14px from each edge);
-  filter: drop-shadow(0 0 6px black);
   background-repeat: no-repeat;
 }
 ```
 
-`#dua-content` uses `overflow: visible` so the drop-shadow is not clipped. The `::after` sits above the list overlays (z-index 20 vs 10) so brackets are always visible, and `pointer-events: none` lets clicks pass through.
+The `::after` sits above the list overlays (z-index 20 vs 10) so brackets are always visible, and `pointer-events: none` lets clicks pass through.
 
 ---
 
