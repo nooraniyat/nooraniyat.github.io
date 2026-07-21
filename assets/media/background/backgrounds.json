@@ -3,60 +3,60 @@
     "hijri_month": 1,
     "hijri_day": 1,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram1.jpg"
+    "image": "assets/media/background/muharram1.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 2,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram2.jpg"
+    "image": "assets/media/background/muharram2.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 3,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram3.jpg"
+    "image": "assets/media/background/muharram3.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 4,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram4.jpg"
+    "image": "assets/media/background/muharram4.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 5,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram5.jpg"
+    "image": "assets/media/background/muharram5.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 6,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram6.jpg"
+    "image": "assets/media/background/muharram6.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 7,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram7.jpg"
+    "image": "assets/media/background/muharram7.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 8,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram8.jpg"
+    "image": "assets/media/background/muharram8.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 9,
     "event_fa": "اول محرم — آغاز سال نو هجری",
-    "image": "media/background/muharram9.jpg"
+    "image": "assets/media/background/muharram9.jpg"
   },
   {
     "hijri_month": 1,
     "hijri_day": 10,
     "event_fa": "عاشورا — شهادت امام حسین علیه‌السلام",
-    "image": "media/background/ashura.jpg"
+    "image": "assets/media/background/ashura.jpg"
   }
 ]

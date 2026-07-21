@@ -1,7 +1,7 @@
 {
   "name": "Nooraniyat",
   "short_name": "Nooraniyat",
-  "description": "Islamic dashboard — Quran reader, duas, prayer times, and Hijri calendar",
+  "description": "Dashboard — text and audio display",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",

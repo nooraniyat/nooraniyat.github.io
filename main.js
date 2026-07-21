@@ -2,7 +2,7 @@
    CONFIG
 ================================================= */
 
-const dbFolder = "db/dua";
+const dbFolder = "db/quotation";
 const manifestFile = `${dbFolder}/manifest.json`;
 const ALADHAN_API = "https://api.aladhan.com/v1";
 const AUDIO_BASE = "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/";
@@ -12,13 +12,13 @@ const AUDIO_BASE = "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/";
    ELEMENTS
 ================================================= */
 
-const duaListEl       = document.getElementById("dua-list");
-const quranSidebarEl  = document.getElementById("quran-sidebar");
+const quotationListEl    = document.getElementById("quotation-list");
+const bookSidebarEl      = document.getElementById("book-sidebar");
 const screenEl        = document.getElementById("screen");
-const duaNameEl       = document.getElementById("dua-name");
-const duaContentEl    = document.getElementById("dua-content");
-const duaSlidesEl     = document.getElementById("dua-slides-container");
-const quranViewEl     = document.getElementById("quran-view");
+const quotationNameEl    = document.getElementById("quotation-name");
+const quotationContentEl = document.getElementById("quotation-content");
+const quotationSlidesEl  = document.getElementById("quotation-slides-container");
+const bookViewEl      = document.getElementById("book-view");
 const webcamViewEl    = document.getElementById("webcam-view");
 const webcamFeedEl    = document.getElementById("webcam-feed");
 const prevBtn         = document.getElementById("prev-slide");
@@ -32,17 +32,17 @@ const contrastBtn     = document.getElementById("contrast-btn");
 const persianPlusBtn    = document.getElementById("persian-plus-btn");
 const persianMinusBtn   = document.getElementById("persian-minus-btn");
 const audioPlayBtn    = document.getElementById("audio-play-btn");
-const btnQuran        = document.getElementById("btn-quran");
+const btnBook         = document.getElementById("btn-book");
 const btnBackground   = document.getElementById("btn-background");
 const btnCalendar     = document.getElementById("btn-calendar");
 const btnCamera       = document.getElementById("btn-camera");
 const btnMusic        = document.getElementById("btn-music");
 const btnFullscreen   = document.getElementById("btn-fullscreen");
-const calBlock        = document.getElementById("calendar-azan-block");
+const calBlock        = document.getElementById("calendar-call-time-block");
 const calHijriEl      = document.getElementById("cal-hijri");
 const calPersianEl    = document.getElementById("cal-persian");
 const calGregEl       = document.getElementById("cal-gregorian");
-const azanTimesEl     = document.getElementById("azan-times");
+const callTimesEl     = document.getElementById("call-times");
 const cityDisplayEl   = document.getElementById("city-display");
 const cityEditRow     = document.getElementById("city-edit-row");
 const cityInputEl     = document.getElementById("city-input");
@@ -60,8 +60,8 @@ const CREDIT_SLIDE       = { ar: "التماس دعا",           fa: null, m: n
    STATE
 ================================================= */
 
-let currentView    = "dua";   // "dua" | "quran" | "webcam" | "background"
-let previousView   = "dua";
+let currentView    = "quotation";   // "quotation" | "book" | "webcam" | "background"
+let previousView   = "quotation";
 let currentLines   = [];
 let currentSlide   = 0;
 let currentFolder  = "";
@@ -69,12 +69,12 @@ let isDarkMode     = false;
 let persianFontSize  = null;
 let webcamStream   = null;
 let calendarVisible = false;
-let cachedAzan     = [];   // prayer times for today, set once after API fetch
+let cachedCallTimes = [];   // prayer times for today, set once after API fetch
 
-// Quran state
-let quranSurahsLoaded = false;
-let quranSurahs    = [];
-let quranVerses    = [];
+// Book state
+let bookSurahsLoaded = false;
+let bookSurahs     = [];
+let bookVerses     = [];
 let currentSurah   = 0;
 let currentAudio   = null;
 let isAutoPlaying  = false;
@@ -112,17 +112,17 @@ async function fetchJSON(path) {
 ================================================= */
 
 function showView(view) {
-  if (view !== "quran") stopAudio();
+  if (view !== "book") stopAudio();
   currentView = view;
 
   // Deactivate all view containers
-  duaSlidesEl.classList.remove("active");
-  quranViewEl.classList.remove("active");
+  quotationSlidesEl.classList.remove("active");
+  bookViewEl.classList.remove("active");
   webcamViewEl.classList.remove("active");  // hides fixed webcam layer
 
   // Sidebars
-  duaListEl.style.display    = "none";
-  quranSidebarEl.style.display = "none";
+  quotationListEl.style.display    = "none";
+  bookSidebarEl.style.display = "none";
 
   // Stop webcam unless entering webcam mode
   if (view !== "webcam") stopWebcam();
@@ -131,8 +131,8 @@ function showView(view) {
   if (view !== "background" && view !== "webcam") previousView = view;
 
   // Active view button styling
-  btnQuran.classList.toggle("active-view", view === "quran");
-  homeBtn.classList.toggle("active-view", view === "dua" && currentLines.length > 0);
+  btnBook.classList.toggle("active-view", view === "book");
+  homeBtn.classList.toggle("active-view", view === "quotation" && currentLines.length > 0);
   btnCamera.classList.toggle("active-view", view === "webcam");
   btnBackground.classList.toggle("active-view", view === "background");
 
@@ -140,32 +140,32 @@ function showView(view) {
   bgLayerEl.classList.toggle("active", view === "background");
   bgLayerEl.style.opacity = view === "background" ? "0.95" : "0.45";
 
-  if (view === "dua") {
-    duaSlidesEl.classList.add("active");
+  if (view === "quotation") {
+    quotationSlidesEl.classList.add("active");
     navGroupEl.classList.toggle("hidden", currentLines.length === 0);
     if (currentLines.length === 0) {
-      duaNameEl.textContent = "";
-      duaSlidesEl.innerHTML = "";
+      quotationNameEl.textContent = "";
+      quotationSlidesEl.innerHTML = "";
     }
-  } else if (view === "quran") {
-    quranSidebarEl.style.display = "grid";
+  } else if (view === "book") {
+    bookSidebarEl.style.display = "grid";
     navGroupEl.classList.remove("hidden");
-    if (!quranSurahsLoaded) loadQuranSurahs();
-    history.replaceState(null, "", "?list=quran");
+    if (!bookSurahsLoaded) loadBookSurahs();
+    history.replaceState(null, "", "?list=book");
   } else if (view === "webcam") {
     webcamViewEl.classList.add("active");
     navGroupEl.classList.add("hidden");
-    duaNameEl.textContent = "";
+    quotationNameEl.textContent = "";
     startWebcam();
   } else if (view === "background") {
     navGroupEl.classList.add("hidden");
-    duaNameEl.textContent = "";
+    quotationNameEl.textContent = "";
     loadBackground();
   }
 
   if (view === "webcam" || view === "background") {
     history.replaceState(null, "", "?view=" + view);
-  } else if (view === "dua") {
+  } else if (view === "quotation") {
     if (currentFolder && currentLines.length > 0) {
       const params = new URLSearchParams();
       params.set("name", currentFolder);
@@ -174,15 +174,15 @@ function showView(view) {
     } else {
       history.replaceState(null, "", window.location.pathname);
     }
-  } else if (view === "quran") {
+  } else if (view === "book") {
     if (currentSurah) {
       const params = new URLSearchParams();
-      params.set("quran", currentSurah);
+      params.set("book", currentSurah);
       const hasBismillah = currentLines[0]?.isBismillah;
       params.set("id", hasBismillah ? currentSlide : currentSlide + 1);
       history.replaceState(null, "", "?" + params.toString());
     } else {
-      history.replaceState(null, "", "?list=quran");
+      history.replaceState(null, "", "?list=book");
     }
   } else {
     history.replaceState(null, "", window.location.pathname);
@@ -193,7 +193,7 @@ function showView(view) {
 
 
 /* =================================================
-   DUA SLIDE LOGIC
+   QUOTATION SLIDE LOGIC
 ================================================= */
 
 
@@ -240,26 +240,26 @@ function showSlide(index, updateURL = true, fromSlider = false) {
   index = Math.max(0, Math.min(index, currentLines.length - 1));
   currentSlide = index;
 
-  if (currentView === "dua") {
-    prepareTextTransition(duaSlidesEl);
-    duaSlidesEl.innerHTML = createSlideHTML(currentLines[index]);
-    markTextEntering(duaSlidesEl);
-  } else if (currentView === "quran") {
-    showQuranVerse(index);
+  if (currentView === "quotation") {
+    prepareTextTransition(quotationSlidesEl);
+    quotationSlidesEl.innerHTML = createSlideHTML(currentLines[index]);
+    markTextEntering(quotationSlidesEl);
+  } else if (currentView === "book") {
+    showBookVerse(index);
   }
 
   updateNavUI();
 
-  if (updateURL && currentFolder && currentView === "dua") {
+  if (updateURL && currentFolder && currentView === "quotation") {
     const params = new URLSearchParams();
     params.set("name", currentFolder);
     params.set("id", index + 1);
     history.replaceState(null, "", "?" + params.toString());
   }
 
-  if (updateURL && currentView === "quran" && currentSurah) {
+  if (updateURL && currentView === "book" && currentSurah) {
     const params = new URLSearchParams();
-    params.set("quran", currentSurah);
+    params.set("book", currentSurah);
     const hasBismillah = currentLines[0]?.isBismillah;
     params.set("id", hasBismillah ? index : index + 1);
     history.replaceState(null, "", "?" + params.toString());
@@ -278,22 +278,22 @@ function updateNavUI() {
   if (nextBtn) nextBtn.disabled = currentSlide === currentLines.length - 1;
 }
 
-async function displayDua(folder, slideIndex = 0) {
+async function displayQuotation(folder, slideIndex = 0) {
   currentFolder = folder;
-  currentView = "dua";
+  currentView = "quotation";
 
-  duaListEl.style.display   = "none";
-  quranSidebarEl.style.display = "none";
-  duaSlidesEl.classList.add("active");
-  quranViewEl.classList.remove("active");
+  quotationListEl.style.display   = "none";
+  bookSidebarEl.style.display = "none";
+  quotationSlidesEl.classList.add("active");
+  bookViewEl.classList.remove("active");
   webcamViewEl.classList.remove("active");
   stopWebcam();
 
-  const duaJson = await fetchJSON(`${dbFolder}/${folder}.json`);
-  if (!duaJson) return;
+  const quotationJson = await fetchJSON(`${dbFolder}/${folder}.json`);
+  if (!quotationJson) return;
 
-  duaNameEl.textContent = duaJson.name_fa || duaJson.uid;
-  currentLines = [...(duaJson.content || []), CREDIT_SLIDE];
+  quotationNameEl.textContent = quotationJson.name_fa || quotationJson.uid;
+  currentLines = [...(quotationJson.content || []), CREDIT_SLIDE];
 
   if (slideSlider) {
     slideSlider.min   = 1;
@@ -307,18 +307,18 @@ async function displayDua(folder, slideIndex = 0) {
   showSlide(Math.max(0, slideIndex), true);
 }
 
-async function loadDuaList() {
+async function loadQuotationList() {
   const folders = await fetchJSON(manifestFile);
   if (!folders || !Array.isArray(folders)) return;
 
   folders.sort((a, b) => (a.name_fa || a.uid).localeCompare(b.name_fa || b.uid, "fa"));
 
-  duaListEl.innerHTML = "";
+  quotationListEl.innerHTML = "";
   for (const item of folders) {
     const btn = document.createElement("button");
     btn.textContent = item.name_fa || item.uid;
-    btn.onclick = () => displayDua(item.uid, 0);
-    duaListEl.appendChild(btn);
+    btn.onclick = () => displayQuotation(item.uid, 0);
+    quotationListEl.appendChild(btn);
   }
 }
 
@@ -326,60 +326,60 @@ function goHome() {
   currentLines  = [];
   currentSlide  = 0;
   currentFolder = "";
-  showView("dua");
+  showView("quotation");
   history.replaceState(null, "", window.location.pathname);
 }
 
 
 /* =================================================
-   QURAN READER
+   BOOK READER
 ================================================= */
 
-async function loadQuranSurahs() {
-  quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری فهرست سور...</div>`;
-  duaNameEl.textContent = "";
+async function loadBookSurahs() {
+  bookViewEl.innerHTML = `<div class="book-loading">در حال بارگذاری فهرست سور...</div>`;
+  quotationNameEl.textContent = "";
   navGroupEl.classList.add("hidden");
   updateFontSizeBtns();
 
-  const data = await fetchJSON("db/quran/manifest.json");
+  const data = await fetchJSON("db/book/manifest.json");
   if (!data || !Array.isArray(data)) {
-    quranViewEl.innerHTML = `<div class="quran-loading">خطا در بارگذاری</div>`;
+    bookViewEl.innerHTML = `<div class="book-loading">خطا در بارگذاری</div>`;
     return;
   }
 
-  quranSurahs = data;
-  quranSurahsLoaded = true;
+  bookSurahs = data;
+  bookSurahsLoaded = true;
 
-  quranSidebarEl.innerHTML = "";
-  for (const s of quranSurahs) {
+  bookSidebarEl.innerHTML = "";
+  for (const s of bookSurahs) {
     const btn = document.createElement("button");
     btn.innerHTML = `
       <span class="surah-num">${toFaDigits(s.id)}</span>
       <span class="surah-arabic">${s.name_arabic}</span>
     `;
-    btn.onclick = () => loadQuranSurah(s.id);
-    quranSidebarEl.appendChild(btn);
+    btn.onclick = () => loadBookSurah(s.id);
+    bookSidebarEl.appendChild(btn);
   }
 
-  quranViewEl.innerHTML = "";
+  bookViewEl.innerHTML = "";
 }
 
-async function loadQuranSurah(surahNum, updateURL = true) {
+async function loadBookSurah(surahNum, updateURL = true) {
   currentSurah = surahNum;
   stopAudio();
-  quranSidebarEl.style.display = "none";
-  quranViewEl.classList.add("active");
+  bookSidebarEl.style.display = "none";
+  bookViewEl.classList.add("active");
 
-  const surah = quranSurahs.find(s => s.id === surahNum);
-  duaNameEl.textContent = surah ? `${toFaDigits(surah.id)}. ${surah.name_arabic}` : "";
+  const surah = bookSurahs.find(s => s.id === surahNum);
+  quotationNameEl.textContent = surah ? `${toFaDigits(surah.id)}. ${surah.name_arabic}` : "";
 
-  quranViewEl.innerHTML = `<div class="quran-loading">در حال بارگذاری...</div>`;
+  bookViewEl.innerHTML = `<div class="book-loading">در حال بارگذاری...</div>`;
 
   const pad = String(surahNum).padStart(3, "0");
-  const data = await fetchJSON(`db/quran/${pad}.json`);
+  const data = await fetchJSON(`db/book/${pad}.json`);
 
   if (!data || !Array.isArray(data)) {
-    quranViewEl.innerHTML = `<div class="quran-loading">خطا در بارگذاری آیات</div>`;
+    bookViewEl.innerHTML = `<div class="book-loading">خطا در بارگذاری آیات</div>`;
     return;
   }
 
@@ -392,10 +392,10 @@ async function loadQuranSurah(surahNum, updateURL = true) {
   }));
 
   const needsBismillah = surahNum !== 1 && surahNum !== 9;
-  quranVerses = needsBismillah
+  bookVerses = needsBismillah
     ? [{ ar: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", fa: "به نام خداوند بخشنده و مهربان", isBismillah: true, surah: surahNum, ayah: 0 }, ...verses]
     : [...verses];
-  currentLines = quranVerses;
+  currentLines = bookVerses;
   currentSlide = 0;
 
   if (slideSlider) {
@@ -410,23 +410,23 @@ async function loadQuranSurah(surahNum, updateURL = true) {
   updateNavUI();
 }
 
-function showQuranVerse(index) {
-  if (!quranVerses.length) return;
-  index = Math.max(0, Math.min(index, quranVerses.length - 1));
+function showBookVerse(index) {
+  if (!bookVerses.length) return;
+  index = Math.max(0, Math.min(index, bookVerses.length - 1));
   currentSlide = index;
 
-  const v = quranVerses[index];
+  const v = bookVerses[index];
   const wasAutoPlaying = isAutoPlaying;
   stopAudio();
 
-  prepareTextTransition(quranViewEl);
-  quranViewEl.innerHTML = `
+  prepareTextTransition(bookViewEl);
+  bookViewEl.innerHTML = `
     <div class="slide">
       <div class="arabic-line">${v.ar}</div>
       <div class="persian-line">${v.fa}</div>
     </div>
   `;
-  markTextEntering(quranViewEl);
+  markTextEntering(bookViewEl);
 
   audioPlayBtn.onclick = () => toggleVerseAudio(v.surah, v.ayah);
   updateFontSizeBtns();
@@ -459,7 +459,7 @@ function playVerseAudio(surah, ayah) {
   audioPlayBtn.textContent = "⏸";
   currentAudio.onended = () => {
     const next = currentSlide + 1;
-    if (isAutoPlaying && next < quranVerses.length) {
+    if (isAutoPlaying && next < bookVerses.length) {
       autoPlayTimer = setTimeout(() => showSlide(next), 1000);
     } else {
       isAutoPlaying = false;
@@ -500,7 +500,7 @@ function stopWebcam() {
 
 
 /* =================================================
-   CALENDAR + AZAN
+   CALENDAR + CALL TIME
 ================================================= */
 
 function getCityData() {
@@ -531,12 +531,12 @@ const JALALI_MONTHS_FA = [
   "آذر","دی","بهمن","اسفند"
 ];
 
-const AZAN_KEYS = {
+const CALL_TIME_KEYS = {
   Fajr: "فجر", Sunrise: "طلوع", Dhuhr: "ظهر",
   Sunset: "غروب", Maghrib: "مغرب"
 };
 
-async function loadCalendarAzan() {
+async function loadCalendarCallTime() {
   const now   = new Date();
   const d = now.getDate(), m = now.getMonth() + 1, y = now.getFullYear();
 
@@ -562,25 +562,25 @@ async function loadCalendarAzan() {
     }
   } catch { calHijriEl.textContent = "—"; }
 
-  // City + Azan
+  // City + Call Time
   const cd = getCityData();
   cityDisplayEl.textContent = cd.label || cd.city;
 
   try {
-    const azanRes = await fetch(`${ALADHAN_API}/timingsByCity?city=${encodeURIComponent(cd.city)}&country=${encodeURIComponent(cd.country)}&method=7`);
-    const azanData = await azanRes.json();
-    const timings = azanData?.data?.timings;
+    const callTimeRes = await fetch(`${ALADHAN_API}/timingsByCity?city=${encodeURIComponent(cd.city)}&country=${encodeURIComponent(cd.country)}&method=7`);
+    const callTimeData = await callTimeRes.json();
+    const timings = callTimeData?.data?.timings;
     if (timings) {
-      cachedAzan = Object.entries(AZAN_KEYS)
+      cachedCallTimes = Object.entries(CALL_TIME_KEYS)
         .filter(([key]) => timings[key])
         .map(([key, label]) => {
           const timeStr = timings[key].replace(/\s*\(.*\)/, '').trim();
           const [h, m] = timeStr.split(':').map(Number);
           return { label, timeStr, mins: h * 60 + m };
         });
-      renderAzan();
+      renderCallTime();
     }
-  } catch { azanTimesEl.textContent = "—"; }
+  } catch { callTimesEl.textContent = "—"; }
 
   // Load background after we have Hijri
   loadBackground();
@@ -590,7 +590,7 @@ function toggleCalendar() {
   calendarVisible = !calendarVisible;
   calBlock.classList.toggle("visible", calendarVisible);
   btnCalendar.classList.toggle("active-view", calendarVisible);
-  if (calendarVisible && calHijriEl.textContent === "—") loadCalendarAzan();
+  if (calendarVisible && calHijriEl.textContent === "—") loadCalendarCallTime();
 }
 
 
@@ -599,7 +599,7 @@ function toggleCalendar() {
 ================================================= */
 
 async function loadBackground() {
-  const manifest = await fetchJSON(`media/background/backgrounds.json`);
+  const manifest = await fetchJSON(`assets/media/background/backgrounds.json`);
   if (!manifest || !Array.isArray(manifest)) return;
 
   // Fetch Hijri date independently if calendar hasn't been loaded yet
@@ -657,25 +657,25 @@ function toggleBackground() {
 ================================================= */
 
 function updateFontSizeBtns() {
-  const duaListOpen    = duaListEl.style.display !== "none";
-  const quranListOpen  = quranSidebarEl.style.display !== "none";
+  const quotationListOpen = quotationListEl.style.display !== "none";
+  const bookListOpen   = bookSidebarEl.style.display !== "none";
 
-  const show = (currentView === "dua"   && currentLines.length > 0  && !duaListOpen) ||
-               (currentView === "quran" && quranVerses.length > 0   && !quranListOpen);
-  const isQuranContent = currentView === "quran" && quranVerses.length > 0 && !quranListOpen;
+  const show = (currentView === "quotation" && currentLines.length > 0  && !quotationListOpen) ||
+               (currentView === "book"      && bookVerses.length > 0   && !bookListOpen);
+  const isBookContent = currentView === "book" && bookVerses.length > 0 && !bookListOpen;
 
   persianPlusBtn.classList.toggle("hidden", !show);
   persianMinusBtn.classList.toggle("hidden", !show);
-  audioPlayBtn.classList.toggle("hidden", !isQuranContent);
+  audioPlayBtn.classList.toggle("hidden", !isBookContent);
   controlsCenterEl.style.display = show ? "" : "none";
 }
 
-function renderAzan() {
-  if (!cachedAzan.length) return;
+function renderCallTime() {
+  if (!cachedCallTimes.length) return;
   const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
-  const upcoming = cachedAzan.filter(a => a.mins > nowMins);
-  const next1 = upcoming.length ? upcoming[0] : cachedAzan[0];
-  azanTimesEl.innerHTML = `<span class="azan-item">${next1.label} ${toFaDigits(next1.timeStr)}</span>`;
+  const upcoming = cachedCallTimes.filter(a => a.mins > nowMins);
+  const next1 = upcoming.length ? upcoming[0] : cachedCallTimes[0];
+  callTimesEl.innerHTML = `<span class="call-time-item">${next1.label} ${toFaDigits(next1.timeStr)}</span>`;
 }
 
 function updateClock() {
@@ -683,7 +683,7 @@ function updateClock() {
   const h = String(now.getHours()).padStart(2, "0");
   const m = String(now.getMinutes()).padStart(2, "0");
   currentTimeEl.textContent = toFaDigits(`${h}:${m}`);
-  renderAzan();
+  renderCallTime();
 }
 
 function toggleContrast() {
@@ -716,19 +716,19 @@ function setPersianFontSize(size) {
 ================================================= */
 
 function dismissOverlays() {
-  duaListEl.style.display = "none";
-  quranSidebarEl.style.display = "none";
+  quotationListEl.style.display = "none";
+  bookSidebarEl.style.display = "none";
   // Restore the content view that was showing before the list opened
-  if (currentView === "dua" && currentLines.length > 0) {
-    duaSlidesEl.classList.add("active");
-  } else if (currentView === "quran" && currentSurah) {
-    quranViewEl.classList.add("active");
+  if (currentView === "quotation" && currentLines.length > 0) {
+    quotationSlidesEl.classList.add("active");
+  } else if (currentView === "book" && currentSurah) {
+    bookViewEl.classList.add("active");
   }
   // Restore content URL or clear
-  if (currentView === "dua" && currentFolder) {
-    // showSlide already set the dua URL — leave it
-  } else if (currentView === "quran" && currentSurah) {
-    // showSlide already set the quran URL — leave it
+  if (currentView === "quotation" && currentFolder) {
+    // showSlide already set the quotation URL — leave it
+  } else if (currentView === "book" && currentSurah) {
+    // showSlide already set the book URL — leave it
   } else {
     history.replaceState(null, "", window.location.pathname);
   }
@@ -741,7 +741,7 @@ document.addEventListener("keydown", (e) => {
   if (e.target === cityInputEl) return;
 
   if (e.key === "Escape") {
-    if (duaListEl.style.display !== "none" || quranSidebarEl.style.display !== "none") {
+    if (quotationListEl.style.display !== "none" || bookSidebarEl.style.display !== "none") {
       dismissOverlays();
     } else {
       goHome();
@@ -764,7 +764,7 @@ document.addEventListener("keydown", (e) => {
 
 async function loadMusicPlaylist() {
   if (musicLoaded) return;
-  const data = await fetchJSON("media/music/playlist.json");
+  const data = await fetchJSON("assets/media/music/playlist.json");
   if (data && Array.isArray(data)) musicPlaylist = data.filter(Boolean);
   musicLoaded = true;
 }
@@ -780,7 +780,7 @@ function pickMusicIndex() {
 function playNextTrack() {
   if (!musicPlaylist.length) return;
   lastMusicIndex = pickMusicIndex();
-  const src = `media/music/${musicPlaylist[lastMusicIndex]}`;
+  const src = `assets/media/music/${musicPlaylist[lastMusicIndex]}`;
   if (musicAudio) { musicAudio.onended = null; musicAudio.pause(); }
   musicAudio = new Audio(src);
   musicAudio.volume = 0.35;
@@ -813,29 +813,29 @@ async function toggleMusic() {
 prevBtn.onclick   = () => showSlide(currentSlide - 1);
 nextBtn.onclick   = () => showSlide(currentSlide + 1);
 homeBtn.onclick = () => {
-  if (duaListEl.style.display !== "none") {
+  if (quotationListEl.style.display !== "none") {
     dismissOverlays();
   } else {
-    if (currentView !== "dua") showView("dua");
-    duaNameEl.textContent = "";
-    duaSlidesEl.classList.remove("active");
-    quranViewEl.classList.remove("active");
-    duaListEl.style.display = "grid";
-    history.replaceState(null, "", "?list=dua");
+    if (currentView !== "quotation") showView("quotation");
+    quotationNameEl.textContent = "";
+    quotationSlidesEl.classList.remove("active");
+    bookViewEl.classList.remove("active");
+    quotationListEl.style.display = "grid";
+    history.replaceState(null, "", "?list=quotation");
     updateFontSizeBtns();
   }
 };
-btnQuran.onclick = () => {
-  if (quranSidebarEl.style.display !== "none") {
+btnBook.onclick = () => {
+  if (bookSidebarEl.style.display !== "none") {
     dismissOverlays();
   } else {
     stopAudio();
-    if (currentView !== "quran") showView("quran");
-    duaNameEl.textContent = "";
-    duaSlidesEl.classList.remove("active");
-    quranViewEl.classList.remove("active");
-    quranSidebarEl.style.display = "grid";
-    history.replaceState(null, "", "?list=quran");
+    if (currentView !== "book") showView("book");
+    quotationNameEl.textContent = "";
+    quotationSlidesEl.classList.remove("active");
+    bookViewEl.classList.remove("active");
+    bookSidebarEl.style.display = "grid";
+    history.replaceState(null, "", "?list=book");
     updateFontSizeBtns();
   }
 };
@@ -883,8 +883,8 @@ citySaveBtn.onclick = () => {
   saveCityData(city, country);
   cityEditRow.style.display = "none";
   cityDisplayEl.textContent = city;
-  azanTimesEl.innerHTML = "...";
-  loadCalendarAzan();
+  callTimesEl.innerHTML = "...";
+  loadCalendarCallTime();
 };
 
 cityInputEl.addEventListener("keydown", e => {
@@ -901,11 +901,11 @@ async function init() {
   updateClock();
   setInterval(updateClock, 60000);
 
-  await loadDuaList();
+  await loadQuotationList();
 
   const params     = new URLSearchParams(window.location.search);
   const nameParam  = params.get("name");
-  const quranParam = parseInt(params.get("quran"), 10);
+  const bookParam  = parseInt(params.get("book"), 10);
   const idRaw      = params.get("id");
   const idParam    = idRaw !== null ? parseInt(idRaw, 10) : null;
   const listParam  = params.get("list");
@@ -920,39 +920,39 @@ async function init() {
     const folders   = await fetchJSON(manifestFile) || [];
     const validUids = folders.map(f => f.uid);
     if (validUids.includes(nameParam)) {
-      await displayDua(nameParam, idParam !== null ? idParam - 1 : 0);
+      await displayQuotation(nameParam, idParam !== null ? idParam - 1 : 0);
       return;
     }
   }
 
-  if (quranParam) {
-    currentView = "quran";
-    previousView = "dua";
-    duaSlidesEl.classList.remove("active");
-    quranViewEl.classList.add("active");
-    duaListEl.style.display = "none";
-    quranSidebarEl.style.display = "none";
-    btnQuran.classList.add("active-view");
+  if (bookParam) {
+    currentView = "book";
+    previousView = "quotation";
+    quotationSlidesEl.classList.remove("active");
+    bookViewEl.classList.add("active");
+    quotationListEl.style.display = "none";
+    bookSidebarEl.style.display = "none";
+    btnBook.classList.add("active-view");
     bgLayerEl.style.opacity = "0.45";
     updateFontSizeBtns();
-    await loadQuranSurahs();
-    await loadQuranSurah(quranParam, false);
-    const hasBismillahInit = quranVerses[0]?.isBismillah;
+    await loadBookSurahs();
+    await loadBookSurah(bookParam, false);
+    const hasBismillahInit = bookVerses[0]?.isBismillah;
     const slideIndex = idParam !== null ? (hasBismillahInit ? idParam : idParam - 1) : 0;
     showSlide(Math.max(0, slideIndex), true);
     return;
   }
 
-  if (listParam === "dua") {
-    showView("dua");
-    duaListEl.style.display = "grid";
+  if (listParam === "quotation") {
+    showView("quotation");
+    quotationListEl.style.display = "grid";
     updateFontSizeBtns();
     return;
   }
 
-  if (listParam === "quran") {
-    await loadQuranSurahs();
-    showView("quran");
+  if (listParam === "book") {
+    await loadBookSurahs();
+    showView("book");
     updateFontSizeBtns();
     return;
   }
@@ -962,7 +962,7 @@ async function init() {
     return;
   }
 
-  showView("dua");
+  showView("quotation");
 }
 
 init();

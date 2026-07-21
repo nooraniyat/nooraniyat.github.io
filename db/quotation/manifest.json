@@ -48,5 +48,10 @@
     "uid": "dua-arafah",
     "name_ar": "دُعَاء عَرَفَة",
     "name_fa": "دعای عرفه"
+  },
+  {
+    "uid": "dua-khatm-quran",
+    "name_ar": "دعاء ختم القرآن",
+    "name_fa": "دعای ختم قرآن"
   }
 ]

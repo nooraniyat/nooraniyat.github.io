@@ -1,29 +1,29 @@
-﻿/* ================================================= */
+/* ================================================= */
 /* ==================== FONTS ====================== */
 /* ================================================= */
 
 @font-face {
   font-family: SamimV1;
   font-weight: normal;
-  src: url('assets/fonts/Samim-v0.10.3.woff') format('woff'),
-       url('assets/fonts/Samim-v0.10.3.ttf') format('truetype');
+  src: url('../fonts/Samim-v0.10.3.woff') format('woff'),
+       url('../fonts/Samim-v0.10.3.ttf') format('truetype');
 }
 
 @font-face {
   font-family: SamimV1;
   font-weight: bold;
-  src: url('assets/fonts/Samim-v0.10.3-Bold.woff') format('woff'),
-       url('assets/fonts/Samim-v0.10.3-Bold.ttf') format('truetype');
+  src: url('../fonts/Samim-v0.10.3-Bold.woff') format('woff'),
+       url('../fonts/Samim-v0.10.3-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: NotoNaskhArabic;
-  src: url('assets/fonts/NotoNaskhArabic-Regular.ttf') format('truetype');
+  src: url('../fonts/NotoNaskhArabic-Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: QuranTaha;
-  src: url('assets/fonts/QuranTaha.ttf') format('truetype');
+  font-family: BookTaha;
+  src: url('../fonts/QuranTaha.ttf') format('truetype');
 }
 
 
@@ -117,8 +117,8 @@ body.dark-mode {
 /* ================= TILE OVERLAYS ================= */
 /* ================================================= */
 
-#dua-list,
-#quran-sidebar {
+#quotation-list,
+#book-sidebar {
   display: none;
   position: absolute;
   inset: 0;
@@ -135,13 +135,13 @@ body.dark-mode {
   background: var(--base-bg);
 }
 
-body.dark-mode #dua-list,
-body.dark-mode #quran-sidebar {
+body.dark-mode #quotation-list,
+body.dark-mode #book-sidebar {
   background: var(--base-bg-dark);
 }
 
-#dua-list button,
-#quran-sidebar button {
+#quotation-list button,
+#book-sidebar button {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -163,27 +163,27 @@ body.dark-mode #quran-sidebar {
   overflow: hidden;
 }
 
-body.dark-mode #dua-list button,
-body.dark-mode #quran-sidebar button {
+body.dark-mode #quotation-list button,
+body.dark-mode #book-sidebar button {
   background: rgba(35, 28, 10, 0.80);
   border-color: rgba(150, 130, 70, 0.4);
 }
 
-#dua-list button:hover,
-#quran-sidebar button:hover {
+#quotation-list button:hover,
+#book-sidebar button:hover {
   background: rgba(220, 200, 140, 0.55);
 }
 
-body.dark-mode #dua-list button:hover,
-body.dark-mode #quran-sidebar button:hover {
+body.dark-mode #quotation-list button:hover,
+body.dark-mode #book-sidebar button:hover {
   background: rgba(80, 65, 20, 0.60);
 }
 
-#quran-sidebar {
+#book-sidebar {
   align-content: start;
 }
 
-#quran-sidebar button {
+#book-sidebar button {
   gap: 1px;
   padding: 3px 6px;
 }
@@ -221,11 +221,11 @@ body.dark-mode #quran-sidebar button:hover {
 
 
 /* ================================================= */
-/* ============= CALENDAR / AZAN BLOCK ============= */
+/* ============= CALENDAR / CALL TIME BLOCK ============= */
 /* ================================================= */
 
-/* â”€â”€ inline calendar+azan inside left FAB block â”€â”€ */
-#calendar-azan-block {
+/* â”€â”€ inline calendar+call time inside left FAB block â”€â”€ */
+#calendar-call-time-block {
   display: none;
   flex-direction: row;
   align-items: center;
@@ -238,11 +238,11 @@ body.dark-mode #quran-sidebar button:hover {
   white-space: nowrap;
 }
 
-#calendar-azan-block.visible {
+#calendar-call-time-block.visible {
   display: flex;
 }
 
-body.dark-mode #calendar-azan-block {
+body.dark-mode #calendar-call-time-block {
   color: #ddd;
 }
 
@@ -275,20 +275,20 @@ body.dark-mode #city-display {
   flex-shrink: 0;
 }
 
-.azan-prefix {
+.call-time-prefix {
   font-size: 10px;
 }
 
-#azan-times {
+#call-times {
   white-space: nowrap;
 }
 
-.azan-item {
+.call-time-item {
   display: inline;
   font-size: 10px;
 }
 
-.azan-label {
+.call-time-label {
   color: #888;
 }
 
@@ -328,10 +328,10 @@ body.dark-mode #city-input {
 
 
 /* ================================================= */
-/* ================= DUA NAME ====================== */
+/* ================= QUOTATION NAME ====================== */
 /* ================================================= */
 
-#dua-name {
+#quotation-name {
   position: relative;
   align-self: center;
   text-align: center;
@@ -348,8 +348,8 @@ body.dark-mode #city-input {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-#dua-name::before,
-#dua-name::after {
+#quotation-name::before,
+#quotation-name::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -358,30 +358,30 @@ body.dark-mode #city-input {
   pointer-events: none;
 }
 
-#dua-name::before {
+#quotation-name::before {
   right: calc(100% + 10px);
   background: linear-gradient(to right, transparent, rgba(180, 150, 60, 0.55));
 }
 
-#dua-name::after {
+#quotation-name::after {
   left: calc(100% + 10px);
   background: linear-gradient(to left, transparent, rgba(180, 150, 60, 0.55));
 }
 
-#dua-name:empty {
+#quotation-name:empty {
   display: none;
 }
 
-body.dark-mode #dua-name {
+body.dark-mode #quotation-name {
   background: rgba(25, 20, 10, 0.88);
   border-color: rgba(150, 130, 70, 0.4);
 }
 
-body.dark-mode #dua-name::before {
+body.dark-mode #quotation-name::before {
   background: linear-gradient(to right, transparent, rgba(150, 120, 40, 0.45));
 }
 
-body.dark-mode #dua-name::after {
+body.dark-mode #quotation-name::after {
   background: linear-gradient(to left, transparent, rgba(150, 120, 40, 0.45));
 }
 
@@ -390,7 +390,7 @@ body.dark-mode #dua-name::after {
 /* ================= CONTENT FRAME ================= */
 /* ================================================= */
 
-#dua-content {
+#quotation-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -399,7 +399,7 @@ body.dark-mode #dua-name::after {
   background-color: inherit;
 }
 
-#dua-content::after {
+#quotation-content::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -436,7 +436,7 @@ body.dark-mode #dua-name::after {
   background-repeat: no-repeat;
 }
 
-body.dark-mode #dua-content::after {
+body.dark-mode #quotation-content::after {
   --bracket-color: rgba(200, 160, 60, 0.50);
 }
 
@@ -445,8 +445,8 @@ body.dark-mode #dua-content::after {
 /* ============= VIEW CONTAINERS =================== */
 /* ================================================= */
 
-#dua-slides-container,
-#quran-view,
+#quotation-slides-container,
+#book-view,
 #webcam-view {
   display: none;
   flex: 1;
@@ -455,15 +455,15 @@ body.dark-mode #dua-content::after {
   overflow: hidden;
 }
 
-#dua-slides-container.active,
-#quran-view.active,
+#quotation-slides-container.active,
+#book-view.active,
 #webcam-view.active {
   display: flex;
 }
 
 
 /* ================================================= */
-/* ================= DUA SLIDES ==================== */
+/* ================= QUOTATION SLIDES ==================== */
 /* ================================================= */
 
 .slide {
@@ -490,14 +490,14 @@ body.dark-mode #dua-content::after {
   display: block;
   margin-top: auto;
   padding-bottom: 12px;
-  font-family: QuranTaha;
+  font-family: BookTaha;
   font-size: 70px;
   line-height: 1.9;
   text-align: center;
 }
 
-#quran-view .arabic-line {
-  font-family: QuranTaha;
+#book-view .arabic-line {
+  font-family: BookTaha;
 }
 
 .arabic-line::after {
@@ -547,12 +547,12 @@ body.dark-mode .persian-line {
 
 
 /* ================================================= */
-/* ================= QURAN READER ================== */
+/* ================= BOOK READER ================== */
 /* ================================================= */
 
 
 .bismillah {
-  font-family: QuranTaha;
+  font-family: BookTaha;
   font-size: 32px;
   text-align: center;
   flex-shrink: 0;
@@ -570,7 +570,7 @@ body.dark-mode .persian-line {
 }
 
 .verse-key {
-  font-family: QuranTaha;
+  font-family: BookTaha;
   font-size: 13px;
   opacity: 0.6;
 }
@@ -589,7 +589,7 @@ body.dark-mode .persian-line {
   opacity: 1;
 }
 
-.quran-loading {
+.book-loading {
   flex: 1;
   display: flex;
   align-items: center;
@@ -600,7 +600,7 @@ body.dark-mode .persian-line {
 }
 
 @media (max-width: 768px) {
-  #quran-view {
+  #book-view {
     padding: 10px 12px;
   }
 }
@@ -782,7 +782,7 @@ body.dark-mode .controls-sep {
 /* ================================================= */
 
 @media (max-width: 768px) {
-  #dua-content::after {
+  #quotation-content::after {
     display: none;
   }
 
@@ -790,8 +790,8 @@ body.dark-mode .controls-sep {
     flex-direction: column;
   }
 
-  #dua-list,
-  #quran-sidebar {
+  #quotation-list,
+  #book-sidebar {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     padding: 20px;
     gap: 6px;
@@ -811,11 +811,11 @@ body.dark-mode .controls-sep {
     margin-bottom: 0;
   }
 
-  #quran-view {
+  #book-view {
     padding: 10px 12px;
   }
 
-  .quran-verse .arabic-line {
+  .book-verse .arabic-line {
     font-size: 28px;
   }
 
@@ -856,4 +856,3 @@ body.dark-mode .controls-sep {
   #controls-left   { order: 2; max-width: 90cqi; flex-wrap: wrap; justify-content: center; overflow: visible; }
   #controls-right  { order: 3; }
 }
-
