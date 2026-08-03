@@ -1,5 +1,35 @@
 [
   {
+    "uid": "ziyarat-ashura",
+    "name_ar": "زيارة عاشوراء",
+    "name_fa": "زیارت عاشورا"
+  },
+  {
+    "uid": "ziyarat-arbaeen",
+    "name_ar": "زيارة الأربعين",
+    "name_fa": "زیارت اربعین امام حسین (ع)"
+  },
+  {
+    "uid": "ziyarat-fatima",
+    "name_ar": "زيارة السيدة فاطمة الزهراء (ع)",
+    "name_fa": "زیارت حضرت فاطمه زهراء (س)"
+  },
+  {
+    "uid": "ziyarat-rasoul",
+    "name_ar": "زيارة رسول الله (ص)",
+    "name_fa": "زیارت حضرت رسول (ص)"
+  },
+  {
+    "uid": "hadith-kisa",
+    "name_ar": "حديث الكساء",
+    "name_fa": "حدیث کساء"
+  },
+  {
+    "uid": "dua-arafah",
+    "name_ar": "دُعَاء عَرَفَة",
+    "name_fa": "دعای عرفه"
+  },
+  {
     "uid": "dua-abu-hamza-thumali",
     "name_ar": "دعاء أبي حمزة الثمالي",
     "name_fa": "دعای ابوحمزه ثمالی"
@@ -23,31 +53,6 @@
     "uid": "dua-nudba",
     "name_ar": "دُعَاء ٱلنُّدْبَة",
     "name_fa": "دعای ندبه"
-  },
-  {
-    "uid": "hadith-kisa",
-    "name_ar": "حديث الكساء",
-    "name_fa": "حدیث کساء"
-  },
-  {
-    "uid": "ziyarat-ashura",
-    "name_ar": "زيارة عاشوراء",
-    "name_fa": "زیارت عاشورا"
-  },
-  {
-    "uid": "ziyarat-fatima",
-    "name_ar": "زيارة السيدة فاطمة الزهراء (ع)",
-    "name_fa": "زیارت حضرت فاطمه زهراء (س)"
-  },
-  {
-    "uid": "ziyarat-rasoul",
-    "name_ar": "زيارة رسول الله (ص)",
-    "name_fa": "زیارت حضرت رسول (ص)"
-  },
-  {
-    "uid": "dua-arafah",
-    "name_ar": "دُعَاء عَرَفَة",
-    "name_fa": "دعای عرفه"
   },
   {
     "uid": "dua-khatm-quran",
